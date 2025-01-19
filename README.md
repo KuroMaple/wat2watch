@@ -1,12 +1,10 @@
-# team01-repo
-
-## Team 01 - WatToWatch
+# Team 01 - WatToWatch
 
 ## Project Description
-TODO
+[ TBD ]
 
 ## Installation Instructions
-TODO
+[ TBD ]
 
 ## Team Members
 
