@@ -1,9 +1,6 @@
 # team01-repo
 
-## Project Name and Team Number
-*we need to pick a team name still**
-
-Team01
+## Team 01 - WatToWatch
 
 ## Project Description
 TODO
