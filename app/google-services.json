@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "323875359522",
+    "project_id": "wat2watch-24b1e",
+    "storage_bucket": "wat2watch-24b1e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:323875359522:android:91be698dc9682b6d36f37b",
+        "android_client_info": {
+          "package_name": "com.team1.wat2watch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "323875359522-gq59u1q98bhom7p4nqc4843h9aoarm7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1FnQ0wqzpfxbkbSGY8sfBCsbvHxffvwk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "323875359522-gq59u1q98bhom7p4nqc4843h9aoarm7a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:323875359522:android:0d4bc3359b25a20536f37b",
+        "android_client_info": {
+          "package_name": "com.wat2watch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "323875359522-gq59u1q98bhom7p4nqc4843h9aoarm7a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1FnQ0wqzpfxbkbSGY8sfBCsbvHxffvwk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "323875359522-gq59u1q98bhom7p4nqc4843h9aoarm7a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
