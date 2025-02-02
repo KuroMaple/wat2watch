@@ -1,8 +1,8 @@
-# 🎬 Team 01 - WatToWatch
+# 🎬 Team 01 - Wat2Watch
 ![Kotlin](https://img.shields.io/badge/Kotlin-%230095D5.svg?&style=for-the-badge&logo=kotlin&logoColor=white)![Firebase](https://img.shields.io/badge/Firebase-%23FFCA28.svg?&style=for-the-badge&logo=firebase&logoColor=white)
 
 ## Project Description
-The Wat2Watch project is a mobile application that is designed to help groups of movie-watchers 
+Wat2Watch is an app designed to help groups of movie-watchers 
 decide on a movie to watch together by facilitating live matching sessions.
 
 ## 📌 Project Description
