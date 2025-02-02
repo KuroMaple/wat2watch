@@ -1,7 +1,8 @@
 # Team 01 - WatToWatch
 
 ## Project Description
-[ TBD ]
+The Wat2Watch project is a mobile application that is designed to help groups of movie-watchers 
+decide on a movie to watch together by facilitating live matching sessions.
 
 ## Installation Instructions
 [ TBD ]
