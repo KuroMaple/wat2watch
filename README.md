@@ -5,8 +5,8 @@ The Wat2Watch project is a mobile application that is designed to help groups of
 decide on a movie to watch together by facilitating live matching sessions.
 
 ### 🛠 Tech Stack
-![Kotlin](https://img.shields.io/badge/Mobile-Kotlin-blue)  
-![Firebase](https://img.shields.io/badge/Backend-Firebase-brightgreen)
+![Kotlin](https://img.shields.io/badge/Kotlin-%230095D5.svg?&style=for-the-badge&logo=kotlin&logoColor=white)  
+![Firebase](https://img.shields.io/badge/Firebase-%23FFCA28.svg?&style=for-the-badge&logo=firebase&logoColor=white)
 
 ## 📌 Project Description
 **WatToWatch** is a mobile application designed to help groups of movie-watchers quickly agree on a film by facilitating **live matching sessions**. Whether it's a casual movie night or a group event, WatToWatch ensures that picking a movie is seamless and fun.
