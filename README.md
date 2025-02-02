@@ -12,10 +12,10 @@ decide on a movie to watch together by facilitating live matching sessions.
 **WatToWatch** is a mobile application designed to help groups of movie-watchers quickly agree on a film by facilitating **live matching sessions**. Whether it's a casual movie night or a group event, WatToWatch ensures that picking a movie is seamless and fun.
 
 ### 🎯 Features
-✅ **Live Movie Matching** – Swipe through movie options and match with friends.
-✅ **Personalized Recommendations** – AI-driven movie suggestions based on preferences.  
-✅ **Seamless Authentication** – Secure sign-in using Firebase.  
-✅ **Cross-Platform Availability** – Optimized for Android devices.
+✅ **Live Movie Matching** – Swipe through movie options and match with friends.\
+✅ **Personalized Recommendations** – AI-driven movie suggestions based on preferences.\
+✅ **Seamless Authentication** – Secure sign-in using Firebase.\
+✅ **Cross-Platform Availability** – Optimized for Android devices.\
 
 ---
 
