@@ -6,14 +6,18 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-01-19,0,0,0,7,0,0,gathering inspiration; setting up Figma design files and a rough design system + early mockups for visual brainstorming
 2025-01-20,0,0,0,1,0,0,iterating on potential UX designs for the matching mechanism (Figma)
 2025-01-20,1,0,0,0,0,0,reviewing the potential designs and leaving feedback/comments
-2025-01-27,1,0,0,1,0,0,brainstorming for project proposal
+2025-01-27,0,0,0,0,0,0.5,preparing meeting agenda for upcoming brainstorming meeting
+2025-01-27,1,0,0,1,0,1,brainstorming for project proposal
 2025-01-27,1.5,1.5,1.5,1.5,0.5,1.5,team meeting discussing project proposal
+2025-01-27,0,0,0,0,0,1,summarizing meeting notes and next steps, setting up Atlassian (Jira) workspace for project management
 2025-01-28,2,0,0,0,0,0,create the use case diagram for P2
 2025-01-29,0,0.5,0.5,0.5,0.5,0,in-class work period: discussing app functionality logistics and plans for technical implementation
 2025-01-29,0,2,2,0,2,2,work on the user scenarios for P2
 2025-01-30,0,0,0,0.5,0,0,work on human values for P2
 2025-01-31,1,0,0,0,0,0,scope out work for iteration 1 demo and create JIRA tickets and start sprint
 2025-02-02,1,1,1,1,1,1,team meeting to decide on scope and split up tasks
+2025-01-31,0,0,0,0,0,1,add all remaining Jira tickets for demo 1 sprint and started assigning users to tasks
 2025-02-02,0,0,2,0,0,0,firebase database research + design
 2025-02-02,1,1,0,0,0,0,setup base repo structure with firebase configs
 2025-02-04,1,0,0,0,0,0,add configurations for google sign in with firebase
+2025-02-04,0,0.5,0.5,0.5,0.5,0.5,in-class work period: splitting up remaining work to do for demo 1 (P3)
