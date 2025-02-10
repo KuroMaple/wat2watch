@@ -7,8 +7,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.team1.wat2watch.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
