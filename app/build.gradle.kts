@@ -61,4 +61,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.activity.compose) // Use the latest version
+    implementation(libs.androidx.material3) // Use the latest version
+    // ... other dependencies
 }
