@@ -13,4 +13,7 @@
     </string>
     <string name="sign_in_button_text">Sign in</string>
     <string name="or">or</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="wat2watch_logo">wat2watch logo</string>
+    <string name="new_to_wat2watch">New to Wat2Watch? <u>Create an account</u></string>
 </resources>
