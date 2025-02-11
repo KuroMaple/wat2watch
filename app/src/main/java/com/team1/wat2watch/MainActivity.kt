@@ -1,39 +1,39 @@
 package com.team1.wat2watch
 
+import com.team1.wat2watch.ui.login.LoginScreen
 import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.team1.wat2watch.databinding.ActivityMainBinding
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.team1.wat2watch.ui.home.HomeScreen
 
-class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-
-    // NOTE: We will need to use the web client ID for Google Sign in later
-    // 323875359522-gq59u1q98bhom7p4nqc4843h9aoarm7a.apps.googleusercontent.com
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContent {
+            MyApp()
+        }
+    }
+}
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        val navView: BottomNavigationView = binding.navView
-
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+@Composable
+fun MyApp() {
+    val navController = rememberNavController()
+    MaterialTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+            NavHost(navController = navController, startDestination = "splash") {
+                composable("splash") { SplashScreen(navController) }
+                composable("login") { LoginScreen(navController = navController) }
+                composable("home") { HomeScreen() }
+            }
+        }
     }
 }
