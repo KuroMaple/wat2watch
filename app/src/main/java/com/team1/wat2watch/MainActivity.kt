@@ -9,6 +9,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 
 class MainActivity : ComponentActivity() {
@@ -22,9 +25,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp() {
+    val navController = rememberNavController()
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-            LoginScreen()
+            NavHost(navController = navController, startDestination = "splash") {
+                composable("splash") { SplashScreen(navController) }
+                composable("login") { LoginScreen() }
+            }
         }
     }
 }
