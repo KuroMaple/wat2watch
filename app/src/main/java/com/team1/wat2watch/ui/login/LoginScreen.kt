@@ -1,3 +1,5 @@
+package com.team1.wat2watch.ui.login
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -24,6 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.team1.wat2watch.R
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 val nunitoSansFont = FontFamily(
     Font(R.font.nunito_sans_7pt_condensed_medium, FontWeight.Normal), // Regular weight
@@ -34,9 +39,11 @@ val rainyHeartsFont = FontFamily(
     Font(R.font.rainyhearts, FontWeight.Normal)
 )
 
-@Preview(showBackground = true)
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = LoginViewModel()
+) {
     Box(
         modifier = modifier
             .requiredWidth(width = 412.dp)
@@ -77,7 +84,8 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             color = Color.Black,
             style = TextStyle(
                 fontSize = 16.sp,
-                fontFamily = nunitoSansFont),
+                fontFamily = nunitoSansFont
+            ),
             modifier = Modifier
                 .align(alignment = Alignment.TopCenter)
                 .offset(
@@ -90,7 +98,8 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             textDecoration = TextDecoration.Underline,
             style = TextStyle(
                 fontSize = 16.sp,
-                fontFamily = nunitoSansFont),
+                fontFamily = nunitoSansFont
+            ),
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
                 .offset(
@@ -102,19 +111,22 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             color = Color.Black,
             style = TextStyle(
                 fontSize = 16.sp,
-                fontFamily = nunitoSansFont),
+                fontFamily = nunitoSansFont
+            ),
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
                 .offset(
                     x = 76.dp,
                     y = 293.dp
                 ))
+        EmailInput(viewModel)
         Text(
             text = "Password",
             color = Color.Black,
             style = TextStyle(
                 fontSize = 16.sp,
-                fontFamily = nunitoSansFont),
+                fontFamily = nunitoSansFont
+            ),
             modifier = Modifier
                 .align(alignment = Alignment.TopStart)
                 .offset(
@@ -144,7 +156,8 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     textAlign = TextAlign.Center,
                     style = TextStyle(
                         fontSize = 18.sp,
-                        fontFamily = nunitoSansFont))
+                        fontFamily = nunitoSansFont
+                    ))
             },
             shape = RoundedCornerShape(8.dp),
             colors = InputChipDefaults.inputChipColors(
@@ -192,97 +205,11 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 contentScale = ContentScale.Fit
             )
 
-//            Box(
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopStart)
-//                    .offset(x = 26.5.dp,
-//                        y = 41.052734375.dp)
-//                    .requiredWidth(width = 99.dp)
-//                    .requiredHeight(height = 79.dp)
-//                    .clip(shape = RoundedCornerShape(24.dp))
-//                    .background(color = Color(0xffbfbfbf)))
-//            Image(
-//                painter = painterResource(id = R.drawable.vector1),
-//                contentDescription = "Vector 1",
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopStart)
-//                    .offset(x = 40.394775390625.dp,
-//                        y = 0.dp)
-//                    .requiredWidth(width = 62.dp)
-//                    .requiredHeight(height = 50.dp)
-//                    .border(border = BorderStroke(1.dp, Color.Black)))
-//            Box(
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopStart)
-//                    .offset(x = 38.5.dp,
-//                        y = 53.052734375.dp)
-//                    .requiredWidth(width = 76.dp)
-//                    .requiredHeight(height = 56.dp)
-//                    .clip(shape = RoundedCornerShape(10.dp))
-//                    .background(color = Color(0xffc9dbef)))
-//            Box(
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopStart)
-//                    .offset(x = 55.5526123046875.dp,
-//                        y = 83.36865234375.dp)
-//                    .requiredSize(size = 5.dp)
-//                    .clip(shape = CircleShape)
-//                    .background(color = Color.Black))
-//            Box(
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopStart)
-//                    .offset(x = 97.23681640625.dp,
-//                        y = 83.36865234375.dp)
-//                    .requiredSize(size = 5.dp)
-//                    .clip(shape = CircleShape)
-//                    .background(color = Color.Black))
-//            Box(
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopStart)
-//                    .offset(x = 76.5.dp,
-//                        y = 81.dp)
-//                    .requiredWidth(width = 8.dp)
-//                    .requiredHeight(height = 16.dp)
-//                    .background(color = Color.Black))
-//            Image(
-//                painter = painterResource(id = R.drawable.vector5),
-//                contentDescription = "Vector 5",
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopStart)
-//                    .offset(x = 0.dp,
-//                        y = 136.5.dp)
-//                    .requiredWidth(width = 98.dp)
-//                    .requiredHeight(height = 30.dp)
-//                    .border(border = BorderStroke(4.dp, Color.Black)))
         }
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xfff5f5f5),
-                unfocusedContainerColor = Color(0xfff5f5f5)
-            ),
-            shape = RoundedCornerShape(8.dp), // Proper rounded corners
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(x = 76.dp, y = 316.dp)
-                .requiredWidth(width = 260.dp)
-                .requiredHeight(height = 36.dp)
-        )
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xfff5f5f5),
-                unfocusedContainerColor = Color(0xfff5f5f5)
-            ),
-            shape = RoundedCornerShape(8.dp), // Proper rounded corners
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(x = 76.dp, y = 384.dp)
-                .requiredWidth(width = 260.dp)
-                .requiredHeight(height = 36.dp)
-                )
+
+
+
+        PasswordInput(viewModel)
         Box(
             modifier = Modifier
                 .offset(x = 65.dp, y = 564.dp) // Positioning
@@ -316,9 +243,6 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
-
-
-
         Text(
             text = "or",
             color = Color(0xffa5a5a5),
@@ -342,4 +266,49 @@ fun LoginScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun LoginScreenPreview() {
     LoginScreen(Modifier)
+}
+
+@Composable
+fun EmailInput(viewModel: LoginViewModel){
+    val email by viewModel.email.observeAsState("") // Default to empty string
+    BasicTextField(
+        value = email,
+        onValueChange = { viewModel.setEmail(it) },
+        textStyle = TextStyle(
+            fontSize = 16.sp,
+            color = Color.Black,
+            fontFamily = nunitoSansFont,
+        ),
+        modifier = Modifier
+            .offset(x = 76.dp, y = 316.dp)
+            .background(Color(0xfff5f5f5), RoundedCornerShape(8.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+            .requiredWidth(260.dp)
+            .requiredHeight(36.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+    )
+}
+
+@Composable
+fun PasswordInput(viewModel: LoginViewModel){
+    val password by viewModel.password.observeAsState("") // Default to empty string
+    BasicTextField(
+        value = password,
+        onValueChange = { viewModel.setPassword(it) },
+        textStyle = TextStyle(
+            fontSize = 16.sp,
+            color = Color.Black,
+            fontFamily = nunitoSansFont,
+        ),
+        visualTransformation = PasswordVisualTransformation(),
+        modifier = Modifier
+            .offset(x = 76.dp, y = 384.dp)
+            .background(Color(0xfff5f5f5), RoundedCornerShape(8.dp))
+            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+            .requiredWidth(260.dp)
+            .requiredHeight(36.dp)
+            .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp)
+        ,
+
+    )
 }

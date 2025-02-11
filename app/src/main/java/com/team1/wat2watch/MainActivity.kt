@@ -1,6 +1,6 @@
 package com.team1.wat2watch
 
-import LoginScreen
+import com.team1.wat2watch.ui.login.LoginScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
