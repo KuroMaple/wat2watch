@@ -20,6 +20,9 @@ class LoginViewModel: ViewModel() {
     private val _createAccountEvent = MutableLiveData<Unit>()
     val createAccount: LiveData<Unit> = _createAccountEvent
 
+    private val _loginError = MutableLiveData<String?>()
+    val loginError: LiveData<String?> = _loginError
+
     fun setEmail(newEmail: String) {
         _email.value = newEmail
     }
@@ -37,7 +40,14 @@ class LoginViewModel: ViewModel() {
         val isAuthenticated = authenticateWithServer(emailValue, passwordValue)
         */
         // Currently mock authentication
-        _loginSuccess.value = emailValue == "test@uwaterloo.ca" && passwordValue == "password123"
+        // Mock authentication
+        if (emailValue == "test@uwaterloo.ca" && passwordValue == "password123") {
+            _loginSuccess.value = true
+            _loginError.value = null  // Clear error on success
+        } else {
+            _loginSuccess.value = false
+            _loginError.value = "Invalid credentials, please try again."
+        }
 
     }
 

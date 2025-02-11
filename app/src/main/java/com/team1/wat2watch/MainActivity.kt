@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.team1.wat2watch.ui.home.HomeScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -30,7 +31,8 @@ fun MyApp() {
         Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
             NavHost(navController = navController, startDestination = "splash") {
                 composable("splash") { SplashScreen(navController) }
-                composable("login") { LoginScreen() }
+                composable("login") { LoginScreen(navController = navController) }
+                composable("home") { HomeScreen() }
             }
         }
     }

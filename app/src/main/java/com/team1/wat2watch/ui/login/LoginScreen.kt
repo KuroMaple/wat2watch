@@ -29,6 +29,8 @@ import com.team1.wat2watch.R
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 val nunitoSansFont = FontFamily(
     Font(R.font.nunito_sans_7pt_condensed_medium, FontWeight.Normal), // Regular weight
@@ -42,8 +44,10 @@ val rainyHeartsFont = FontFamily(
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = LoginViewModel()
+    viewModel: LoginViewModel = LoginViewModel(),
+    navController: NavController
 ) {
+    val loginError by viewModel.loginError.observeAsState() // Observe the error state
     Box(
         modifier = modifier
             .requiredWidth(width = 412.dp)
@@ -148,31 +152,7 @@ fun LoginScreen(
                     y = 54.dp
                 )
         )
-        InputChip(
-            label = {
-                Text(
-                    text = "Sign in",
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(
-                        fontSize = 18.sp,
-                        fontFamily = nunitoSansFont
-                    ))
-            },
-            shape = RoundedCornerShape(8.dp),
-            colors = InputChipDefaults.inputChipColors(
-                containerColor = Color(0xFFC9DBEF),
-                selectedContainerColor = Color(0xFFC9DBEF),
-                disabledContainerColor = Color(0xFFC9DBEF)
-            ),
-            selected = true,
-            onClick = { },
-            modifier = Modifier
-                .align(alignment = Alignment.TopStart)
-                .offset(
-                    x = 170.dp,
-                    y = 478.dp
-                ))
+        SignInButton(viewModel, navController)
         Text(
             text = "Sign In",
             color = Color.Black,
@@ -259,13 +239,30 @@ fun LoginScreen(
                 )
                 .requiredWidth(width = 45.dp)
                 .requiredHeight(height = 22.dp))
+
+        loginError?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = nunitoSansFont
+                ),
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(x = 76.dp, y = 460.dp) // Position it below the password field
+            )
+        }
     }
 }
 
 @Preview(widthDp = 412, heightDp = 917)
 @Composable
 private fun LoginScreenPreview() {
-    LoginScreen(Modifier)
+    // Create a temporary NavController for preview
+    val navController = rememberNavController()
+
+    LoginScreen(Modifier, LoginViewModel(), navController)
 }
 
 @Composable
@@ -311,4 +308,45 @@ fun PasswordInput(viewModel: LoginViewModel){
         ,
 
     )
+}
+
+@Composable
+fun SignInButton(viewModel: LoginViewModel, navController: NavController){
+    val loginSuccess by viewModel.loginSuccess.observeAsState(false)
+
+    LaunchedEffect(loginSuccess) {
+        if (loginSuccess) {
+            navController.navigate("home")
+        }
+    }
+    Box(
+        modifier = Modifier.fillMaxSize()  // Ensure the Box takes up the full screen or desired space
+    ) {
+        InputChip(
+            label = {
+                Text(
+                    text = "Sign in",
+                    color = Color.Black,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = nunitoSansFont
+                    )
+                )
+            },
+            shape = RoundedCornerShape(8.dp),
+            colors = InputChipDefaults.inputChipColors(
+                containerColor = Color(0xFFC9DBEF),
+                selectedContainerColor = Color(0xFFC9DBEF),
+                disabledContainerColor = Color(0xFFC9DBEF)
+            ),
+            selected = true,
+            onClick = {
+                viewModel.login()
+            },
+            modifier = Modifier
+                .align(Alignment.TopStart)  // Now works because the parent is a Box
+                .offset(x = 170.dp, y = 478.dp)
+        )
+    }
 }
