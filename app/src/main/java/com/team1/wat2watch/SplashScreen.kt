@@ -34,7 +34,6 @@ val nunitoSansFont = FontFamily(
 
 @Composable
 fun SplashScreen(navController: NavController) {
-    val context = LocalContext.current
     LaunchedEffect(Unit) {
         delay(2000)  // Show splash screen for 2 seconds
         // Navigate to the Login screen (you can use an Intent or a state)
