@@ -32,7 +32,7 @@ fun MyApp() {
             NavHost(navController = navController, startDestination = "splash") {
                 composable("splash") { SplashScreen(navController) }
                 composable("login") { LoginScreen(navController = navController) }
-                composable("home") { HomeScreen() }
+                composable("home") { HomeScreen(navController = navController) }
             }
         }
     }
