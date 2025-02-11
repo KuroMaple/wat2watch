@@ -1,7 +1,5 @@
 package com.team1.wat2watch
 
-import android.app.Activity
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,12 +16,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.team1.wat2watch.ui.login.LoginScreen
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
+
+val nunitoSansFont = FontFamily(
+    Font(R.font.nunito_sans_7pt_condensed_medium, FontWeight.Normal), // Regular weight
+    Font(R.font.nunito_sans_7pt_black, FontWeight.Bold) // Bold weight
+)
 
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -58,7 +64,8 @@ fun SplashScreen(navController: NavController) {
                 text = "Wat2Watch",
                 color = Color.Black,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineLarge
+                fontFamily = nunitoSansFont,
+                fontSize = 32.sp,
             )
         }
     }
@@ -67,5 +74,9 @@ fun SplashScreen(navController: NavController) {
 @Preview(widthDp = 412, heightDp = 917)
 @Composable
 private fun SplashScreenPreview() {
-    SplashScreen(NavController(LocalContext.current))
+    // Create a temporary NavController for preview
+    val navController = rememberNavController()
+
+    // Call SplashScreen with the mocked NavController
+    SplashScreen(navController = navController)
 }
