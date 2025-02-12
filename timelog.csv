@@ -25,5 +25,6 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-02-8,0,5,0,3,0,0,create login page and clean up UI spacing/fonts/sizes and addressing comments (Figma)
 2025-02-9,0,7,0,2,0,0,login page dev and designing match party screens (Figma)
 2025-02-10,0,7,0,0,0,0,completed login page UI portion
+2025-02-10,0,0,0,0,5,0,completed history page UI portion
 2025-02-11,1,5,0,0,0,0,test Hassan's branch locally and review PR and develop Home screen ui
 2025-02-11,2,0,0,0,0,0,Configured firebase into app to wire up login step
