@@ -16,7 +16,24 @@ decide on a movie to watch together by facilitating live matching sessions.
 ---
 
 ## 📥 Installation Instructions
-📌 *Coming Soon...*
+### Step 1
+
+Clone repository locally
+```bash
+git clone <https>
+```
+
+### Step 2
+
+Sync Gradle changes locally: File > Sync Projects with Gradle Files
+
+### Step 3
+
+Setup Android Emulator (Vanilla API35)
+
+## To Run The Application
+
+Click the play icon in the top bar or go to Run > Run app
 
 ---
 
