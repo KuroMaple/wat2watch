@@ -2,12 +2,12 @@ package com.team1.wat2watch.ui.home
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel {
+    private val _code = MutableLiveData<String>()
+    val code: LiveData<String> = _code
 
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+    fun setCode(newCode: String) {
+        _code.value = newCode
     }
-    val text: LiveData<String> = _text
 }
