@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
 
 
@@ -33,6 +34,7 @@ fun MyApp() {
                 composable("splash") { SplashScreen(navController) }
                 composable("login") { LoginScreen(navController = navController) }
                 composable("home") { HomeScreen(navController = navController) }
+                composable("history") { HistoryScreen(navController = navController) }
             }
         }
     }
