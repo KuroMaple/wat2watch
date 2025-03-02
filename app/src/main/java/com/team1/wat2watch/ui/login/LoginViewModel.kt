@@ -24,14 +24,19 @@ class LoginViewModel : ViewModel() {
     private val _loginError = MutableLiveData<String?>()
     val loginError: LiveData<String?> = _loginError
 
+    private val _forgotPasswordSuccess = MutableLiveData<Boolean?>()
+    val forgotPasswordSuccess: MutableLiveData<Boolean?> = _forgotPasswordSuccess
+
     fun setEmail(newEmail: String) {
         _email.value = newEmail
         _loginError.value = null  // Clear error when email is changed
+        _forgotPasswordSuccess.value = null
     }
 
     fun setPassword(newPassword: String) {
         _password.value = newPassword
         _loginError.value = null  // Clear error when password is changed
+        _forgotPasswordSuccess.value = null
     }
 
     fun login() {
@@ -75,7 +80,34 @@ class LoginViewModel : ViewModel() {
             }
     }
 
+    fun onForgotPasswordClick() {
+        val emailValue = _email.value ?: ""
+        if (emailValue.isBlank()) {
+            _loginError.value = "Please enter your email address to reset password."
+            return
+        }
+        if (!isValidEmail(emailValue)) {
+            _loginError.value = "Please enter a valid email address."
+            return
+        }
+
+        auth.sendPasswordResetEmail(emailValue)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _forgotPasswordSuccess.value = true
+                    _loginError.value = null
+                } else {
+                    _forgotPasswordSuccess.value = false
+                    _loginError.value = "Failed to send reset email: ${task.exception?.message}"
+                }
+            }
+    }
+
     private fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun onCreateAccountClick() {
+        _createAccountEvent.value = Unit
     }
 }

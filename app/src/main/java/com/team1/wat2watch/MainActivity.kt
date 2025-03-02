@@ -12,13 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
 import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
-
+import com.team1.wat2watch.ui.signup.SignUpScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             MyApp()
         }
@@ -35,6 +37,7 @@ fun MyApp() {
                 composable("login") { LoginScreen(navController = navController) }
                 composable("home") { HomeScreen(navController = navController) }
                 composable("history") { HistoryScreen(navController = navController) }
+                composable("signup") { SignUpScreen(navController = navController) }
             }
         }
     }
