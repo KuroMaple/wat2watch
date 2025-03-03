@@ -23,6 +23,7 @@ import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.signup.SignUpScreen
+import com.team1.wat2watch.ui.profile.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -88,6 +89,7 @@ fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
                 composable("home") { HomeScreen(navController = navController) }
                 composable("history") { HistoryScreen(navController = navController) }
                 composable("signup") { SignUpScreen(navController = navController) }
+                composable("profile") { ProfileScreen(navController = navController) }
             }
         }
     }
