@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "323875359522-39thp3f6bdaesv9ctibv728q3itpljo6.apps.googleusercontent.com",
+          "client_id": "323875359522-0mvn5jm07o23hd9vcm3j900qu51vlrl7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.team1.wat2watch",
-            "certificate_hash": "c7891e7006184b6c2db5e229e24343a7f3817e6b"
+            "certificate_hash": "868f0ac42b8de7037ca525a71e8eb064cff47ce7"
           }
         },
         {
