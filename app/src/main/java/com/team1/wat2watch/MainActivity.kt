@@ -14,6 +14,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
+import com.team1.wat2watch.ui.profile.ProfileScreen
+
 
 
 class MainActivity : ComponentActivity() {
@@ -35,6 +37,7 @@ fun MyApp() {
                 composable("login") { LoginScreen(navController = navController) }
                 composable("home") { HomeScreen(navController = navController) }
                 composable("history") { HistoryScreen(navController = navController) }
+                composable("profile") { ProfileScreen(navController = navController) }
             }
         }
     }
