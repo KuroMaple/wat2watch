@@ -16,4 +16,6 @@
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="wat2watch_logo">wat2watch logo</string>
     <string name="new_to_wat2watch">New to Wat2Watch? <u>Create an account</u></string>
+    <string name="default_web_client_id">323875359522-gq59u1q98bhom7p4nqc4843h9aoarm7a.apps.googleusercontent.com
+    </string>
 </resources>

@@ -45,14 +45,22 @@ val rainyHeartsFont = FontFamily(
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = LoginViewModel(),
-    navController: NavController
+    viewModel: LoginViewModel,
+    navController: NavController,
+    onGoogleSignInClicked: () -> Unit
 ) {
+    val loginSuccess by viewModel.loginSuccess.observeAsState(initial = false)
     val loginError by viewModel.loginError.observeAsState() // Observe the error state
     val forgotPasswordSuccess by viewModel.forgotPasswordSuccess.observeAsState()
 
     val showMessage = loginError != null || forgotPasswordSuccess == true
     val additionalOffset = if (showMessage) 40.dp else 0.dp
+
+    LaunchedEffect(loginSuccess) {
+        if (loginSuccess) {
+            navController.navigate("home")
+        }
+    }
 
     Box(
         modifier = modifier
@@ -239,7 +247,10 @@ fun LoginScreen(
                 .requiredHeight(height = 22.dp)
         )
 
-        GoogleSignInButton(Modifier.offset(y = 564.dp + additionalOffset))
+        GoogleSignInButton(
+            modifier = Modifier.offset(y = 564.dp + additionalOffset),
+            onClick = onGoogleSignInClicked
+        )
     }
 }
 
@@ -247,7 +258,13 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenPreview() {
     val navController = rememberNavController()
-    LoginScreen(Modifier, LoginViewModel(), navController)
+    val viewModel = LoginViewModel()
+    LoginScreen(
+        modifier = Modifier,
+        viewModel = viewModel,
+        navController = navController,
+        onGoogleSignInClicked = {}
+    )
 }
 
 @Composable
@@ -332,15 +349,20 @@ fun SignInButton(viewModel: LoginViewModel, navController: NavController, modifi
 }
 
 @Composable
-fun GoogleSignInButton(modifier: Modifier = Modifier) {
+fun GoogleSignInButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     Box(
         modifier = modifier
-            .then(Modifier
-                .offset(x = 65.dp)
-                .width(282.dp)
-                .height(35.dp)
-                .background(color = Color.White, shape = RoundedCornerShape(8.dp))
-                .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(8.dp))
+            .then(
+                Modifier
+                    .offset(x = 65.dp)
+                    .width(282.dp)
+                    .height(35.dp)
+                    .background(color = Color.White, shape = RoundedCornerShape(8.dp))
+                    .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(8.dp))
+                    .clickable(onClick = onClick)
             ),
         contentAlignment = Alignment.Center
     ) {
