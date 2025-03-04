@@ -22,6 +22,7 @@ import com.team1.wat2watch.ui.navbar.NavBarViewModel
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.team1.wat2watch.ui.login.LoginViewModel
+import com.team1.wat2watch.ui.match.MatchScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -67,10 +68,13 @@ fun MyApp() {
                         LoginScreen(navController, loginViewModel) // Login screen
                     }
                     composable("home") {
-                        HomeScreen() // Show home screen when logged in
+                        HomeScreen(navController) // Show home screen when logged in
                     }
                     composable("history") {
                         HistoryScreen() // Show history screen when logged in
+                    }
+                    composable("match") {
+                        MatchScreen(navController) // Show matching screen when logged in
                     }
                 }
             }
