@@ -21,6 +21,7 @@ import com.team1.wat2watch.ui.navbar.NavBar
 import com.team1.wat2watch.ui.navbar.NavBarViewModel
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.match.MatchScreen
 
@@ -51,7 +52,10 @@ fun MyApp() {
 
             Scaffold(
                 bottomBar = {
-                    if (isLoggedIn) {
+                    // Track navigation changes properly
+                    val currentBackStackEntry = navController.currentBackStackEntryAsState().value
+                    val currentRoute = currentBackStackEntry?.destination?.route
+                    if (isLoggedIn && currentRoute != "match") {
                         NavBar(viewModel = NavBarViewModel(navController)) // Show NavBar when logged in
                     }
                 }
