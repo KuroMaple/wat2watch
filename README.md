@@ -107,6 +107,8 @@ Replacing it is okay as long as you do not get rid of any of the fingerprints on
 ### Note
 A few things to note are the `default_web_client_id` -> this should not cause any issues but it is still good to double check that it matches what is in Firebase in case someone's commit overides the value but it is important to make sure that does not happen in the first place!
 
+Here is a detailed guide: https://developer.android.com/identity/sign-in/credential-manager-siwg#set-google
+
 ## To Run The Application
 
 Click the play icon in the top bar or go to Run > Run app
