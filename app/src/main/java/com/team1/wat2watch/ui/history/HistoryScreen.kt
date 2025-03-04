@@ -23,8 +23,6 @@ import com.team1.wat2watch.ui.navbar.NavBar
 @Composable
 fun HistoryScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = LoginViewModel(),
-    navController: NavController
 ) {
     Column(
         modifier = modifier
@@ -44,7 +42,6 @@ fun HistoryScreen(
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        NavBar(navController = navController)
     }
 }
 
@@ -107,6 +104,5 @@ fun TopNavigationNoBackArrow(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun HistoryPreview() {
-    val navController = rememberNavController()
-    HistoryScreen(navController = navController)
+    HistoryScreen()
 }

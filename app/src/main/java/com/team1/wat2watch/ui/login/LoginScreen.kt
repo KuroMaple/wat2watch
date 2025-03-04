@@ -43,13 +43,12 @@ val rainyHeartsFont = FontFamily(
 
 @Composable
 fun LoginScreen(
-    modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = LoginViewModel(),
-    navController: NavController
+    navController: NavController,
+    loginViewModel: LoginViewModel 
 ) {
-    val loginError by viewModel.loginError.observeAsState() // Observe the error state
+    val loginError by  loginViewModel.loginError.observeAsState() // Observe the error state
     Box(
-        modifier = modifier
+        modifier = Modifier
             .requiredWidth(width = 412.dp)
             .requiredHeight(height = 917.dp)
             .background(color = Color.White)
@@ -123,7 +122,7 @@ fun LoginScreen(
                     x = 76.dp,
                     y = 293.dp
                 ))
-        EmailInput(viewModel)
+        EmailInput( loginViewModel)
         Text(
             text = "Password",
             color = Color.Black,
@@ -152,7 +151,7 @@ fun LoginScreen(
                     y = 54.dp
                 )
         )
-        SignInButton(viewModel, navController)
+        SignInButton( loginViewModel, navController)
         Text(
             text = "Sign In",
             color = Color.Black,
@@ -189,7 +188,7 @@ fun LoginScreen(
 
 
 
-        PasswordInput(viewModel)
+        PasswordInput( loginViewModel)
         Box(
             modifier = Modifier
                 .offset(x = 65.dp, y = 564.dp) // Positioning
@@ -262,15 +261,15 @@ private fun LoginScreenPreview() {
     // Create a temporary NavController for preview
     val navController = rememberNavController()
 
-    LoginScreen(Modifier, LoginViewModel(), navController)
+    LoginScreen(navController, LoginViewModel())
 }
 
 @Composable
-fun EmailInput(viewModel: LoginViewModel){
-    val email by viewModel.email.observeAsState("") // Default to empty string
+fun EmailInput( loginViewModel: LoginViewModel){
+    val email by  loginViewModel.email.observeAsState("") // Default to empty string
     BasicTextField(
         value = email,
-        onValueChange = { viewModel.setEmail(it) },
+        onValueChange = {  loginViewModel.setEmail(it) },
         textStyle = TextStyle(
             fontSize = 16.sp,
             color = Color.Black,
@@ -287,11 +286,11 @@ fun EmailInput(viewModel: LoginViewModel){
 }
 
 @Composable
-fun PasswordInput(viewModel: LoginViewModel){
-    val password by viewModel.password.observeAsState("") // Default to empty string
+fun PasswordInput( loginViewModel: LoginViewModel){
+    val password by  loginViewModel.password.observeAsState("") // Default to empty string
     BasicTextField(
         value = password,
-        onValueChange = { viewModel.setPassword(it) },
+        onValueChange = {  loginViewModel.setPassword(it) },
         textStyle = TextStyle(
             fontSize = 16.sp,
             color = Color.Black,
@@ -311,8 +310,8 @@ fun PasswordInput(viewModel: LoginViewModel){
 }
 
 @Composable
-fun SignInButton(viewModel: LoginViewModel, navController: NavController){
-    val loginSuccess by viewModel.loginSuccess.observeAsState(false)
+fun SignInButton(loginViewModel: LoginViewModel, navController: NavController){
+    val loginSuccess by loginViewModel.loginSuccess.observeAsState(false)
 
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) {
@@ -342,7 +341,7 @@ fun SignInButton(viewModel: LoginViewModel, navController: NavController){
             ),
             selected = true,
             onClick = {
-                viewModel.login()
+                loginViewModel.login()
             },
             modifier = Modifier
                 .align(Alignment.TopStart)  // Now works because the parent is a Box

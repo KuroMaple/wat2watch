@@ -28,10 +28,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.team1.wat2watch.R
-import com.team1.wat2watch.ui.navbar.NavBar
+
 
 
 val nunitoSansFont = FontFamily(
@@ -46,7 +44,6 @@ val rainyHeartsFont = FontFamily(
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
     viewModel: HomeViewModel = HomeViewModel()
 ) {
     Column(
@@ -152,18 +149,14 @@ fun HomeScreen(
 
 
         }
-
-        // Bottom Navigation Bar
-        NavBar(navController)
     }
 }
 
 @Preview
 @Composable
 fun HomeScreenPreview() {
-    val navController = rememberNavController()
 
-    HomeScreen(Modifier, navController)
+    HomeScreen(Modifier)
 }
 
 @Composable
