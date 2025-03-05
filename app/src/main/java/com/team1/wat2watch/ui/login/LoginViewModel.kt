@@ -5,12 +5,16 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.GoogleAuthProvider
 
 class LoginViewModel : ViewModel() {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val _email = MutableLiveData<String>()
     val email: LiveData<String> = _email
     private val _password = MutableLiveData<String>()
@@ -24,14 +28,53 @@ class LoginViewModel : ViewModel() {
     private val _loginError = MutableLiveData<String?>()
     val loginError: LiveData<String?> = _loginError
 
+    private val _forgotPasswordSuccess = MutableLiveData<Boolean?>()
+    val forgotPasswordSuccess: MutableLiveData<Boolean?> = _forgotPasswordSuccess
+
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+
+    fun initGoogleSignInClient(client: GoogleSignInClient) {
+        googleSignInClient = client
+    }
+
+    fun handleGoogleSignInResult(task: Task<GoogleSignInAccount>) {
+        try {
+            val account = task.getResult(ApiException::class.java)
+            Log.d("LoginViewModel", "Google Sign In successful, ID Token: ${account.idToken}")
+            firebaseAuthWithGoogle(account.idToken!!)
+        } catch (e: ApiException) {
+            val errorMessage = "Google sign in failed: ${e.statusCode}: ${e.message}"
+            _loginError.value = errorMessage
+            Log.e("LoginViewModel", errorMessage, e)
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _loginSuccess.value = true
+                    _loginError.value = null
+                } else {
+                    _loginSuccess.value = false
+                    _loginError.value = "Google sign in failed: ${task.exception?.message}"
+                    Log.e("LoginViewModel", "firebaseAuthWithGoogle", task.exception)
+                }
+            }
+    }
+
     fun setEmail(newEmail: String) {
         _email.value = newEmail
         _loginError.value = null  // Clear error when email is changed
+        _forgotPasswordSuccess.value = null
     }
 
     fun setPassword(newPassword: String) {
         _password.value = newPassword
         _loginError.value = null  // Clear error when password is changed
+        _forgotPasswordSuccess.value = null
     }
 
     fun login() {
@@ -75,7 +118,34 @@ class LoginViewModel : ViewModel() {
             }
     }
 
+    fun onForgotPasswordClick() {
+        val emailValue = _email.value ?: ""
+        if (emailValue.isBlank()) {
+            _loginError.value = "Please enter your email address to reset password."
+            return
+        }
+        if (!isValidEmail(emailValue)) {
+            _loginError.value = "Please enter a valid email address."
+            return
+        }
+
+        auth.sendPasswordResetEmail(emailValue)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _forgotPasswordSuccess.value = true
+                    _loginError.value = null
+                } else {
+                    _forgotPasswordSuccess.value = false
+                    _loginError.value = "Failed to send reset email: ${task.exception?.message}"
+                }
+            }
+    }
+
     private fun isValidEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun onCreateAccountClick() {
+        _createAccountEvent.value = Unit
     }
 }

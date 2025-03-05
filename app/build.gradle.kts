@@ -17,6 +17,20 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("/Users/asma.ansari/Desktop/wat2watch/wat2watch_debug.keystore")
+            storePassword = "test1234"
+            keyAlias = "debug"
+            keyPassword = "test1234"
+        }
+        create("wat2watchDebug") {
+            storeFile = file("/Users/asma.ansari/Desktop/wat2watch/wat2watch_debug.keystore")
+            keyAlias = "wat2watch_debug"
+            storePassword = "test1234"
+            keyPassword = "test1234"
+        }
+    }
     namespace = "com.team1.wat2watch"
     compileSdk = 35
 
@@ -26,7 +40,9 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig = signingConfigs.getByName("wat2watchDebug")
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
         buildConfigField("String", "IMAGE_BASE_URL", "\"$imageBaseUrl\"")
@@ -39,6 +55,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("wat2watchDebug")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("wat2watchDebug")
         }
     }
     compileOptions {
@@ -73,11 +93,20 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview.android)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.firebase.database.ktx)
     implementation(libs.androidx.core.splashscreen)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.activity.compose) // Use the latest version
+    implementation(libs.androidx.material3) // Use the latest version
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.google.firebase.firestore.ktx)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
+    implementation(libs.firebase.firestore)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.material3)
     // API dependencies
