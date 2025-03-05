@@ -22,6 +22,7 @@ import com.team1.wat2watch.ui.navbar.NavBarViewModel
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.team1.wat2watch.ui.SwipeExample.SwipeExampleScreen
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.match.MatchScreen
 
