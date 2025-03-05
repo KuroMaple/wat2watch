@@ -3,25 +3,12 @@ package com.team1.wat2watch.ui.match
 import androidx.lifecycle.ViewModel
 import com.team1.wat2watch.data.api.RetrofitInstance
 import com.team1.wat2watch.data.model.Movie
-import com.team1.wat2watch.data.model.MovieResponse
-import com.team1.wat2watch.data.repository.MovieRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MatchViewModel: ViewModel() {
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies: StateFlow<List<Movie>> = _movies // Exposed for the UI layer
-
-    // Handle errors and loading state
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
-
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
 
     suspend fun fetchMovies(
         apiKey: String,
@@ -61,10 +48,5 @@ class MatchViewModel: ViewModel() {
             }
         }
 
-    }
-
-    fun removeTopMovie() {
-        //TODO: Modify this function to discern left from right swipe and add to watchlist
-        _movies.value = _movies.value.drop(1)
     }
 }
