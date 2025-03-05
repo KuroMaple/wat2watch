@@ -29,4 +29,4 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-02-11,1,5,0,0,0,0,test Hassan's branch locally and review PR and develop Home screen ui
 2025-02-11,2,0,0,0,0,0,Configured firebase into app to wire up login step
 2025-03-03,0,10,0,0,0,0,Worked on nav bar, and match screen ui
-2025-03-04,0,10,0,0,0,0,API fetching and wiring, resolving merge conflicts
+2025-03-04,0,12,0,0,0,0,API fetching and wiring, resolving merge conflicts, swipe logic
