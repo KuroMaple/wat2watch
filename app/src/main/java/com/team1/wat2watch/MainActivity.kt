@@ -2,17 +2,20 @@ package com.team1.wat2watch
 
 import com.team1.wat2watch.ui.login.LoginScreen
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -22,8 +25,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
 import com.team1.wat2watch.ui.login.LoginViewModel
+import com.team1.wat2watch.ui.match.MatchScreen
+import com.team1.wat2watch.ui.navbar.NavBar
+import com.team1.wat2watch.ui.navbar.NavBarViewModel
 import com.team1.wat2watch.ui.signup.SignUpScreen
 import com.team1.wat2watch.ui.profile.ProfileScreen
+
+
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -52,22 +60,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "splash") {
-                composable("splash") { SplashScreen(navController) }
-                composable("login") {
-                    LoginScreen(
-                        navController = navController,
-                        viewModel = viewModel,
-                        onGoogleSignInClicked = {
-                            val signInIntent = googleSignInClient.signInIntent
-                            googleSignInLauncher.launch(signInIntent)
-                        }
-                    )
-                }
-                composable("home") { HomeScreen(navController = navController) }
-                composable("history") { HistoryScreen(navController = navController) }
-                composable("signup") { SignUpScreen(navController = navController) }
+            MyApp(viewModel = viewModel) {
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
             }
         }
     }
@@ -76,20 +71,40 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
     val navController = rememberNavController()
+    val loginViewModel = LoginViewModel()
+
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-            NavHost(navController = navController, startDestination = "splash") {
+
+            Scaffold(
+                bottomBar = {
+                    // Track navigation changes properly
+                    val currentBackStackEntry = navController.currentBackStackEntryAsState().value
+                    val currentRoute = currentBackStackEntry?.destination?.route
+                    Log.d("RouteCheck", "Current Route: $currentRoute")
+                    if (currentRoute != "match" && currentRoute != "login" && currentRoute != "splash") {
+                        NavBar(viewModel = NavBarViewModel(navController)) // Show NavBar
+                    }
+                }
+            ) { innerPadding ->
+            NavHost(
+                navController = navController,
+                startDestination = "splash",
+                modifier = Modifier.padding(innerPadding)) {
                 composable("splash") { SplashScreen(navController) }
-                composable("login") {     LoginScreen(
+                composable("login") {
+                    LoginScreen(
                     modifier = Modifier,
                     viewModel = viewModel,
                     navController = navController,
-                    onGoogleSignInClicked = {}
-                ) }
+                    onGoogleSignInClicked = {})
+                }
                 composable("home") { HomeScreen(navController = navController) }
-                composable("history") { HistoryScreen(navController = navController) }
+                composable("history") { HistoryScreen() }
                 composable("signup") { SignUpScreen(navController = navController) }
-                composable("profile") { ProfileScreen(navController = navController) }
+                composable("profile") { ProfileScreen() }
+                composable("match") { MatchScreen(navController) }
+            }
             }
         }
     }

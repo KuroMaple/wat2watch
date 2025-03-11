@@ -11,22 +11,23 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.team1.wat2watch.R
 
 @Composable
-fun NavBar(navController: NavController) {
-    val selectedIcon = remember { mutableStateOf("Home Icon") } // Default selected icon
+fun NavBar(viewModel: NavBarViewModel) {
+    val selectedItem = viewModel.selectedItem.collectAsState()
 
     Row(
         modifier = Modifier
@@ -43,9 +44,9 @@ fun NavBar(navController: NavController) {
             R.drawable.wat2watch_navbar_search_icon to "Search Icon",
             R.drawable.wat2watch_navbar_add_icon to "Add Icon",
             R.drawable.wat2watch_navbar_history_icon to "History Icon",
-            R.drawable.wat2watch_navbar_user_icon to "User Icon"
-        ).forEach { (icon, description) ->
-            val isSelected = selectedIcon.value == description
+            R.drawable.wat2watch_navbar_user_icon to "Profile Icon"
+        ).forEach { (item, description) ->
+            val isSelected = selectedItem.value == description
             val backgroundColor = if (isSelected) Color(0xffc9dbef) else Color.White
             val iconSize = if (description == "Add Icon") 36.dp else 24.dp
             Box(
@@ -54,11 +55,13 @@ fun NavBar(navController: NavController) {
                     .requiredHeight(42.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(backgroundColor)
-                    .clickable { selectedIcon.value = description }, // Update selection on click
+                    .clickable {
+                        viewModel.onNavItemSelect(description)
+                    }, // Update selection on click
                 contentAlignment = Alignment.Center // Centers icon inside Box
             ) {
                 Icon(
-                    painter = painterResource(id = icon),
+                    painter = painterResource(id = item),
                     contentDescription = description,
                     modifier = Modifier
                         .requiredWidth(iconSize)
@@ -72,6 +75,11 @@ fun NavBar(navController: NavController) {
 @Preview(widthDp = 412, heightDp = 74)
 @Composable
 private fun NavBarPreview() {
-    val navController = rememberNavController()
-    NavBar(navController)
+    val context = LocalContext.current
+    val fakeNavController = remember { NavController(context) }
+    val fakeViewModel = remember { NavBarViewModel(fakeNavController) }
+
+    // Set a default selected icon for preview
+    LaunchedEffect(Unit) { fakeViewModel.onNavItemSelect("Home Icon") }
+    NavBar(viewModel = fakeViewModel)
 }
