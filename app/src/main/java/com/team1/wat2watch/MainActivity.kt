@@ -2,6 +2,7 @@ package com.team1.wat2watch
 
 import com.team1.wat2watch.ui.login.LoginScreen
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -59,22 +60,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "splash") {
-                composable("splash") { SplashScreen(navController) }
-                composable("login") {
-                    LoginScreen(
-                        navController = navController,
-                        viewModel = viewModel,
-                        onGoogleSignInClicked = {
-                            val signInIntent = googleSignInClient.signInIntent
-                            googleSignInLauncher.launch(signInIntent)
-                        }
-                    )
-                }
-                composable("home") { HomeScreen(navController = navController) }
-                composable("history") { HistoryScreen(navController = navController) }
-                composable("signup") { SignUpScreen(navController = navController) }
+            MyApp(viewModel = viewModel) {
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
             }
         }
     }
@@ -83,17 +71,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
     val navController = rememberNavController()
-    val loginViewModel: LoginViewModel = viewModel() // ViewModel for login
+    val loginViewModel = LoginViewModel()
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-            val isLoggedIn = loginViewModel.loginSuccess.observeAsState(false).value
+
             Scaffold(
                 bottomBar = {
                     // Track navigation changes properly
                     val currentBackStackEntry = navController.currentBackStackEntryAsState().value
                     val currentRoute = currentBackStackEntry?.destination?.route
-                    if (isLoggedIn && currentRoute != "match") {
+                    Log.d("RouteCheck", "Current Route: $currentRoute")
+                    if (currentRoute != "match" && currentRoute != "login" && currentRoute != "splash") {
                         NavBar(viewModel = NavBarViewModel(navController)) // Show NavBar
                     }
                 }
@@ -113,7 +102,7 @@ fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
                 composable("home") { HomeScreen(navController = navController) }
                 composable("history") { HistoryScreen() }
                 composable("signup") { SignUpScreen(navController = navController) }
-                composable("profile") { ProfileScreen(navController = navController) }
+                composable("profile") { ProfileScreen() }
                 composable("match") { MatchScreen(navController) }
             }
             }

@@ -19,9 +19,10 @@ class NavBarViewModel(private val navController: NavController) : ViewModel() {
                 _selectedItem.value = when (currentRoute) {
                     "home" -> "Home Icon"
                     "history" -> "History Icon"
+                    "profile" -> "Profile Icon"
                     //                "search" -> "Search Icon"
                     //                "add" -> "Add Icon"
-                    //                "user" -> "User Icon"
+
                     else -> "Home Icon" // Default case
                 }
             }
@@ -35,9 +36,9 @@ class NavBarViewModel(private val navController: NavController) : ViewModel() {
         val route = when (description) {
             "Home Icon" -> "home"
             "History Icon" -> "history"
+            "Profile Icon" -> "profile"
 //            "Search Icon" -> "search"
 //            "Add Icon" -> "add"
-//            "User Icon" -> "user"
             else -> return
         }
 

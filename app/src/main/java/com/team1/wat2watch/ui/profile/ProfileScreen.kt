@@ -29,8 +29,6 @@ import com.team1.wat2watch.ui.navbar.NavBar
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = LoginViewModel(),
-    navController: NavController
 ) {
     var reWatchToggle by remember { mutableStateOf(false) }
 
@@ -178,8 +176,6 @@ fun ProfileScreen(
                 )
             }
         }
-
-        NavBar(navController = navController)
     }
 }
 

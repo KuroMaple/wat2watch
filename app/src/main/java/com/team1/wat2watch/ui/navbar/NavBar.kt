@@ -46,7 +46,7 @@ fun NavBar(viewModel: NavBarViewModel) {
             R.drawable.wat2watch_navbar_search_icon to "Search Icon",
             R.drawable.wat2watch_navbar_add_icon to "Add Icon",
             R.drawable.wat2watch_navbar_history_icon to "History Icon",
-            R.drawable.wat2watch_navbar_user_icon to "User Icon"
+            R.drawable.wat2watch_navbar_user_icon to "Profile Icon"
         ).forEach { (item, description) ->
             val isSelected = selectedItem.value == description
             val backgroundColor = if (isSelected) Color(0xffc9dbef) else Color.White

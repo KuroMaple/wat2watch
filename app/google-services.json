@@ -22,6 +22,46 @@
           }
         },
         {
+          "client_id": "323875359522-2e2utf6qkp4pij4o4tf74vdfirq9vi1f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.team1.wat2watch",
+            "certificate_hash": "c7891e7006184b6c2db5e229e24343a7f3817e6b"
+          }
+        },
+        {
+          "client_id": "323875359522-6agt56anv4sbk7vjptk5860v6ibeeg72.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.team1.wat2watch",
+            "certificate_hash": "d3c72b3f5186a94565a373f8f9ad506cf2e19cd9"
+          }
+        },
+        {
+          "client_id": "323875359522-c1pb4q6kag0anbsdaa0tag855i63h1pk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.team1.wat2watch",
+            "certificate_hash": "8890530fbf8627ef597a29c8987ed84d07cb7af1"
+          }
+        },
+        {
+          "client_id": "323875359522-jruulk7bqntft382fvkdrrs9jc4cor2b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.team1.wat2watch",
+            "certificate_hash": "933da7a8fa3acab8584b65d56053afdc058674ff"
+          }
+        },
+        {
+          "client_id": "323875359522-t3usnpn6uah2iut03l5121tsj870jpdk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.team1.wat2watch",
+            "certificate_hash": "a09cdb5fb0f2a91cfb15e1303346931aaea1d276"
+          }
+        },
+        {
           "client_id": "323875359522-gq59u1q98bhom7p4nqc4843h9aoarm7a.apps.googleusercontent.com",
           "client_type": 3
         }
