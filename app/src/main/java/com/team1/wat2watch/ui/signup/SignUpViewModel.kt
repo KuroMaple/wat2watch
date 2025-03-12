@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import wat2watch.utils.FirestoreHelper
 
 //import com.google.firebase.database.FirebaseDatabase
 
@@ -62,8 +63,9 @@ class SignUpViewModel : ViewModel() {
             val emailValue = _email.value ?: ""
             val passwordValue = _password.value ?: ""
             val confirmPasswordValue = _confirmPassword.value ?: ""
+            val usernameValue = _username.value ?: ""
 
-            if (emailValue.isBlank() || passwordValue.isBlank() || confirmPasswordValue.isBlank()) {
+            if (emailValue.isBlank() || passwordValue.isBlank() || confirmPasswordValue.isBlank() || usernameValue.isBlank()) {
                 _signUpError.value = "All fields are required."
                 return@launch
             }
@@ -91,6 +93,11 @@ class SignUpViewModel : ViewModel() {
                         _signUpError.value = null
                         _navigationEvent.value = "home"
                         Log.d("SignUpViewModel", "Navigation event set to home: ${_navigationEvent.value}")
+
+                        // Getting UID from Firebase Auth and adding the user to Firestore
+                        val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+                        FirestoreHelper.addUserToFirestore(emailValue, usernameValue)
+
                     } else {
                         Log.e("SignUpViewModel", "Sign up failed: ${task.exception?.message}")
                         _signUpSuccess.value = false
