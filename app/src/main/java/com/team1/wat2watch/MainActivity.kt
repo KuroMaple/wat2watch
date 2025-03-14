@@ -30,7 +30,9 @@ import com.team1.wat2watch.ui.navbar.NavBar
 import com.team1.wat2watch.ui.navbar.NavBarViewModel
 import com.team1.wat2watch.ui.signup.SignUpScreen
 import com.team1.wat2watch.ui.profile.ProfileScreen
+import com.team1.wat2watch.ui.watchlist.MovieDetailsScreen
 import com.team1.wat2watch.ui.watchlist.WatchlistScreen
+import com.team1.wat2watch.ui.watchlist.WatchlistViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -105,6 +107,17 @@ fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
                 composable("profile") { ProfileScreen() }
                 composable("match") { MatchScreen(navController) }
                 composable("search") { WatchlistScreen(navController = navController) }
+                composable("movieDetails/{movieId}") { backStackEntry ->
+                    val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
+                    val viewModel = WatchlistViewModel()
+                    val movie = movieId?.let { viewModel.getMovieById(it) }
+
+                    if (movie != null) {
+                        MovieDetailsScreen(movie = movie, navController = navController)
+                    } else {
+                        Text(text = "Movie not found")
+                    }
+                }
             }
             }
         }

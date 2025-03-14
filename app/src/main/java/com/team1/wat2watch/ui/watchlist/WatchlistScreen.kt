@@ -40,18 +40,15 @@ import com.team1.wat2watch.ui.watchlist.WatchlistViewModel
 import com.team1.wat2watch.ui.navbar.NavBar
 
 @Composable
-fun WatchlistScreen(
-    navController: NavController,
-    modifier: Modifier = Modifier
-) {
-    val viewModel = WatchlistViewModel()
-    var movies by remember { mutableStateOf(viewModel.movies.value) }
+fun WatchlistScreen(navController: NavController, modifier: Modifier = Modifier) {
+    val viewModel = remember { WatchlistViewModel() } // Ensure ViewModel persists
+    val movies by viewModel.movies.collectAsState()  // Observe changes
     var selectedSort by remember { mutableStateOf("A-Z") }
     var searchQuery by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) } // State for dropdown menu
 
-    fun updateMovies() {
-        movies = viewModel.movies.value
-            .filter { it.title.contains(searchQuery, ignoreCase = true) }
+    val filteredMovies = remember(searchQuery, selectedSort, movies) {
+        movies.filter { it.title.contains(searchQuery, ignoreCase = true) }
             .let {
                 when (selectedSort) {
                     "A-Z" -> it.sortedBy { movie -> movie.title }
@@ -61,10 +58,6 @@ fun WatchlistScreen(
                     else -> it
                 }
             }
-    }
-
-    LaunchedEffect(searchQuery, selectedSort) {
-        updateMovies()
     }
 
     Column(
@@ -77,24 +70,25 @@ fun WatchlistScreen(
             text = "Watchlist",
             color = Color.Black,
             style = TextStyle(fontSize = 28.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, top = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp, top = 8.dp)
         )
 
         Text(
             text = "All your favourite movies, all in one place.",
             color = Color.Black,
             style = TextStyle(fontSize = 18.sp),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
+        // Search Bar
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = {
-                searchQuery = it
-            },
-            placeholder = {
-                Text(text = "Search for a movie...", color = Color.Gray)
-            },
+            onValueChange = { searchQuery = it },
+            placeholder = { Text(text = "Search for a movie...", color = Color.Gray) },
             trailingIcon = {
                 Icon(imageVector = Icons.Filled.Search, contentDescription = "Search Icon", tint = Color.Gray)
             },
@@ -105,8 +99,9 @@ fun WatchlistScreen(
                 .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp)),
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
+        // Sorting Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End,
@@ -118,8 +113,6 @@ fun WatchlistScreen(
                 color = Color.Black,
                 modifier = Modifier.padding(end = 8.dp)
             )
-
-            var expanded by remember { mutableStateOf(false) }
 
             Box {
                 Button(onClick = { expanded = true }) {
@@ -136,7 +129,6 @@ fun WatchlistScreen(
                             onClick = {
                                 selectedSort = option
                                 expanded = false
-                                updateMovies()
                             }
                         )
                     }
@@ -147,21 +139,24 @@ fun WatchlistScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn {
-            items(movies) { movie ->
-                MovieItem(movie = movie)
+            items(filteredMovies) { movie ->
+                MovieItem(movie = movie, navController = navController)
             }
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: Movie) {
+fun MovieItem(movie: Movie, navController: NavController) {
     var isBookmarked by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable {
+                navController.navigate("movieDetails/${movie.id}")  // Navigate using movie ID
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
