@@ -30,7 +30,7 @@ import com.team1.wat2watch.ui.navbar.NavBar
 import com.team1.wat2watch.ui.navbar.NavBarViewModel
 import com.team1.wat2watch.ui.signup.SignUpScreen
 import com.team1.wat2watch.ui.profile.ProfileScreen
-
+import com.team1.wat2watch.ui.watchlist.WatchlistScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -104,6 +104,7 @@ fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
                 composable("signup") { SignUpScreen(navController = navController) }
                 composable("profile") { ProfileScreen() }
                 composable("match") { MatchScreen(navController) }
+                composable("search") { WatchlistScreen(navController = navController) }
             }
             }
         }

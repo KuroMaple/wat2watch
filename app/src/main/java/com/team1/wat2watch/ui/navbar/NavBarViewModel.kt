@@ -20,7 +20,7 @@ class NavBarViewModel(private val navController: NavController) : ViewModel() {
                     "home" -> "Home Icon"
                     "history" -> "History Icon"
                     "profile" -> "Profile Icon"
-                    //                "search" -> "Search Icon"
+                    "search" -> "Search Icon"
                     //                "add" -> "Add Icon"
 
                     else -> "Home Icon" // Default case
@@ -37,7 +37,7 @@ class NavBarViewModel(private val navController: NavController) : ViewModel() {
             "Home Icon" -> "home"
             "History Icon" -> "history"
             "Profile Icon" -> "profile"
-//            "Search Icon" -> "search"
+            "Search Icon" -> "search"
 //            "Add Icon" -> "add"
             else -> return
         }
