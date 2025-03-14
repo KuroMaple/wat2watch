@@ -5,6 +5,27 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 
 object FirestoreHelper {
+
+    data class MovieItem(
+        val title: String = "",
+        val year: String = "",
+        val runtime: String = "",
+        val poster: String = "",
+        val summary: String = "",
+        val addedOn: String = ""
+    )
+
+    data class UserInfo(
+        val uid: String = "",
+        val username: String = ""
+    )
+
+    data class MatchHistoryItem(
+        val sessionId: String = "",
+        val selectedMovie: MovieItem = MovieItem(),
+        val users: List<UserInfo> = emptyList()
+    )
+
     private val db = FirebaseFirestore.getInstance()
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
@@ -76,8 +97,9 @@ object FirestoreHelper {
 
     /**
      * -----------------------------------------------------------------------------------------
-     * Adds a movie to the user's history.
+     * Adds a movie to the user's watchlist
      */
+
     fun addToWatchList(movieId: String, title: String, year: String, runtime: String, poster: String, summary: String) {
         val uid = getCurrentUserUid() ?: return
         val watchListRef = db.collection("users").document(uid).collection("watchList")
@@ -88,7 +110,7 @@ object FirestoreHelper {
             "runtime" to runtime,
             "poster" to poster,
             "summary" to summary,
-            "addedOn" to System.currentTimeMillis() // Optional: To track when the movie was added
+            "addedOn" to System.currentTimeMillis()
         )
 
         watchListRef.document(movieId).set(movieData)
@@ -100,5 +122,114 @@ object FirestoreHelper {
             }
     }
 
+    /**
+     * -----------------------------------------------------------------------------------------
+     * Gets all movies from user's watchlist, they will be in a list of MovieItem structure
+     */
 
+    fun getUserWatchlist(userId: String, onSuccess: (List<MovieItem>) -> Unit, onFailure: (Exception) -> Unit) {
+        val watchListRef = db.collection("users").document(userId).collection("watchList")
+
+        watchListRef.get()
+            .addOnSuccessListener { result ->
+                val watchlist = mutableListOf<MovieItem>()
+                for (document in result) {
+                    val title = document.getString("title") ?: ""
+                    val year = document.getString("year") ?: ""
+                    val runtime = document.getString("runtime") ?: ""
+                    val poster = document.getString("poster") ?: ""
+                    val summary = document.getString("summary") ?: ""
+                    val addedOn = document.getString("addedOn") ?: ""
+
+                    val MovieItem = MovieItem(title, year, runtime, poster, summary, addedOn)
+                    watchlist.add(MovieItem)
+                }
+                Log.d("FirestoreHelper", "Fetched watchlist for User")
+                onSuccess(watchlist)
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreHelper", "Error fetching watchlist: ${e.message}")
+                onFailure(e)
+            }
+    }
+
+    /**
+     * -----------------------------------------------------------------------------------------
+     * Adds an ended session to the user's match history (should be called from session end)
+     */
+
+    fun addMatchHistory(sessionId: String, movie: MovieItem, users: List<UserInfo>) {
+        val uid = getCurrentUserUid() ?: return
+        val matchHistoryRef = db.collection("users").document(uid).collection("matchHistory")
+
+        val matchData = hashMapOf(
+            "sessionId" to sessionId,
+            "selectedMovie" to hashMapOf(
+                "title" to movie.title,
+                "year" to movie.year,
+                "runtime" to movie.runtime,
+                "poster" to movie.poster,
+                "summary" to movie.summary,
+                "addedOn" to System.currentTimeMillis()
+            ),
+            "users" to users.map { user ->
+                hashMapOf(
+                    "uid" to user.uid,
+                    "username" to user.username
+                )
+            }
+        )
+
+        matchHistoryRef.document(sessionId).set(matchData)
+            .addOnSuccessListener {
+                Log.d("FirestoreHelper", "Match history added successfully")
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreHelper", "Error adding match history: ${e.message}")
+            }
+    }
+
+    /**
+     * -----------------------------------------------------------------------------------------
+     * Gets all matches from user's match history
+     */
+
+    fun getUserMatchHistory(userId: String, onSuccess: (List<MatchHistoryItem>) -> Unit, onFailure: (Exception) -> Unit) {
+        val matchHistoryRef = db.collection("users").document(userId).collection("matchHistory")
+
+        matchHistoryRef.get()
+            .addOnSuccessListener { result ->
+                val matchHistoryList = mutableListOf<MatchHistoryItem>()
+                for (document in result) {
+                    val sessionId = document.getString("sessionId") ?: ""
+
+                    val movieData = document.get("selectedMovie") as? Map<String, Any> ?: emptyMap()
+                    val movie = MovieItem(
+                        title = movieData["title"] as? String ?: "",
+                        year = movieData["year"] as? String ?: "",
+                        runtime = movieData["runtime"] as? String ?: "",
+                        poster = movieData["poster"] as? String ?: "",
+                        summary = movieData["summary"] as? String ?: "",
+                        addedOn = movieData["addedOn"]?.toString() ?: ""
+                    )
+
+                    val usersData = document.get("users") as? List<Map<String, Any>> ?: emptyList()
+                    val users = usersData.map { userMap ->
+                        UserInfo(
+                            uid = userMap["uid"] as? String ?: "",
+                            username = userMap["username"] as? String ?: ""
+                        )
+                    }
+
+                    val matchHistoryItem = MatchHistoryItem(sessionId, movie, users)
+                    matchHistoryList.add(matchHistoryItem)
+                }
+                Log.d("FirestoreHelper", "Fetched match history for User")
+                onSuccess(matchHistoryList)
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreHelper", "Error fetching match history: ${e.message}")
+                onFailure(e)
+            }
+    }
 }
