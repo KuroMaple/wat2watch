@@ -17,21 +17,21 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file("/Users/asma.ansari/Desktop/wat2watch/wat2watch_debug.keystore")
-            storePassword = "test1234"
-            keyAlias = "debug"
-            keyPassword = "test1234"
-        }
-        create("wat2watch_hassan_PC") {
-            storeFile =
-                file("C:\\Users\\Hashm\\Desktop\\Coding Projects\\wat2watch\\hassanMac.keystore")
-            keyAlias = "hassanMac"
-            keyPassword = "123456"
-            storePassword = "123456"
-        }
-    }
+//    signingConfigs {
+//        getByName("debug") {
+//            storeFile = file("/Users/asma.ansari/Desktop/wat2watch/wat2watch_debug.keystore")
+//            storePassword = "test1234"
+//            keyAlias = "debug"
+//            keyPassword = "test1234"
+//        }
+//        create("wat2watch_hassan_PC") {
+//            storeFile =
+//                file("C:\\Users\\Hashm\\Desktop\\Coding Projects\\wat2watch\\hassanMac.keystore")
+//            keyAlias = "hassanMac"
+//            keyPassword = "123456"
+//            storePassword = "123456"
+//        }
+//    }
     namespace = "com.team1.wat2watch"
     compileSdk = 35
 
@@ -58,10 +58,10 @@ android {
             )
 //            signingConfig = signingConfigs.getByName("wat2watchDebug")
         }
-        getByName("debug") {
-//            signingConfig = signingConfigs.getByName("wat2watchDebug")
-            signingConfig = signingConfigs.getByName("wat2watch_hassan_PC")
-        }
+//        getByName("debug") {
+////            signingConfig = signingConfigs.getByName("wat2watchDebug")
+//            signingConfig = signingConfigs.getByName("wat2watch_hassan_PC")
+//        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
