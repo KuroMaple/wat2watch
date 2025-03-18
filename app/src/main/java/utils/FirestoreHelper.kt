@@ -3,6 +3,8 @@ package wat2watch.utils
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
+import kotlin.math.ceil
+import com.google.firebase.firestore.FieldValue
 
 object FirestoreHelper {
 
@@ -232,4 +234,104 @@ object FirestoreHelper {
                 onFailure(e)
             }
     }
+
+    /**
+     * -----------------------------------------------------------------------------------------
+     * Session Functions
+     */
+
+    fun createSession(onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        // Creating a random ID using firestore
+        val sessionId = FirebaseFirestore.getInstance().collection("sessions").document().id
+        val sessionData = hashMapOf(
+            "sessionId" to sessionId,
+            "users" to emptyList<String>(),
+            "swipes" to hashMapOf<String, Int>(), // Dictionary containing key: movie ID, val: swipe count
+            "countGoal" to 1, // Default count goal for a single user
+            "active" to true
+        )
+
+        FirebaseFirestore.getInstance().collection("sessions").document(sessionId)
+            .set(sessionData)
+            .addOnSuccessListener {
+                Log.d("FirestoreHelper", "Session created: $sessionId")
+                onSuccess(sessionId)
+            }
+            .addOnFailureListener { e ->
+                Log.e("FirestoreHelper", "Error creating session: ${e.message}")
+                onFailure(e)
+            }
+    }
+
+    fun joinSession(sessionId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val sessionRef = FirebaseFirestore.getInstance().collection("sessions").document(sessionId)
+        val uid = getCurrentUserUid() ?: return
+
+        sessionRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val users = document.get("users") as? List<String> ?: emptyList()
+                val newCountGoal = ceil(users.size / 2.0).toInt()  // Majority
+
+                sessionRef.update(
+                    "users", FieldValue.arrayUnion(uid),
+                    "countGoal", newCountGoal
+                )
+                    .addOnSuccessListener {
+                        Log.d("FirestoreHelper", "User $uid joined session $sessionId")
+                        onSuccess()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirestoreHelper", "Error joining session: ${e.message}")
+                        onFailure(e)
+                    }
+            } else {
+                onFailure(Exception("Session not found"))
+            }
+        }.addOnFailureListener { e ->
+            onFailure(e)
+        }
+    }
+
+    fun logSwipe(sessionId: String, movieId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val sessionRef = FirebaseFirestore.getInstance().collection("sessions").document(sessionId)
+
+        sessionRef.get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val swipes = document.get("swipes") as? MutableMap<String, Long> ?: mutableMapOf()
+                val countGoal = document.get("countGoal") as? Int ?: 1
+                val newCount = (swipes[movieId] ?: 0) + 1
+
+                sessionRef.update("swipes.$movieId", newCount)
+                    .addOnSuccessListener {
+                        Log.d("FirestoreHelper", "Swipe logged for movie $movieId in session $sessionId")
+
+                        // Check if the session should end based on the countGoal
+                        if (newCount >= countGoal) {
+                            sessionRef.update("status", "ended", "selectedMovie", movieId)
+                                .addOnSuccessListener {
+                                    Log.d("FirestoreHelper", "Session $sessionId ended. Movie: $movieId")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("FirestoreHelper", "Error ending session: ${e.message}")
+                                }
+                        }
+                        onSuccess()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirestoreHelper", "Error logging swipe: ${e.message}")
+                        onFailure(e)
+                    }
+            } else {
+                onFailure(Exception("Session not found"))
+            }
+        }.addOnFailureListener { e ->
+            onFailure(e)
+        }
+    }
+
+
+
+
+
+
 }
