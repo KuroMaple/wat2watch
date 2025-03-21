@@ -27,14 +27,14 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-02-10,0,7,0,0,0,0,completed login page UI portion
 2025-02-10,0,0,0,0,5,0,completed history page UI portion
 2025-02-11,1,5,0,0,0,0,test Hassan's branch locally and review PR and develop Home screen ui
-2025-02-11,2,0,0,0,0,0,Configured firebase into app to wire up login step
+2025-02-11,3,0,0,0,0,0,Configured firebase into app to wire up login step
 2025-03-02,1,1,1,1,0,0,team meeting to decide on scope and split up tasks for demo 2
 2025-03-02,0,0,2,0,0,0,movies API research and testing and creating sample
-2025-03-02,3,0,0,0,0,0,create the sign up flow and configure forget password email
+2025-03-02,4,0,0,0,0,0,create the sign up flow and configure forget password email
 2025-03-02,0,0,0,1,0,0,clean up Figma designs for user profile page
 2025-03-03,0,0,0,0,3,0,implement user profile page UI
 2025-03-03,0,10,0,0,0,0,Worked on nav bar and match screen ui
-2025-03-03,4,0,0,0,0,0,configure sign in with google and write detailed readme instructions for configuration
+2025-03-03,6,0,0,0,0,0,configure sign in with google and write detailed readme instructions for configuration
 2025-03-04,0,12,0,0,0,0,API fetching and wiring and resolving merge conflicts and swipe logic
 2025-03-04,0,3,0,0,0,0,resolving merge conflicts
 2025-03-11,0,0,3,0,0,0,working on database abstraction (interaction) package
@@ -42,3 +42,4 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-03-13,0,0,0,0,12,0,implement watchlist page UIs
 2025-03-14,0,0,0,0,0,1,addressing watchlist pages comments (Figma)
 2025-03-16,0.5,0.5,0.5,0.5,0.5,0.5,team meeting to update about everyone's progress
+2025-03-16,2,0,0,0,0,0,fix login and sign up flow and implement dynamic fetching from firebase for user profile
