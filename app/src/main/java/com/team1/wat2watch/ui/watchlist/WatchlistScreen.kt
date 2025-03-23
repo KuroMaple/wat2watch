@@ -1,4 +1,4 @@
-package com.team1.wat2watch.ui.watchlist
+ package com.team1.wat2watch.ui.watchlist
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -33,13 +34,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.home.HomeViewModel
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.watchlist.WatchlistViewModel
 import com.team1.wat2watch.ui.navbar.NavBar
+import utils.Movie
 
-@Composable
+ @Composable
 fun WatchlistScreen(navController: NavController, modifier: Modifier = Modifier) {
     val viewModel = remember { WatchlistViewModel() } // Ensure ViewModel persists
     val movies by viewModel.movies.collectAsState()  // Observe changes
@@ -53,8 +56,8 @@ fun WatchlistScreen(navController: NavController, modifier: Modifier = Modifier)
                 when (selectedSort) {
                     "A-Z" -> it.sortedBy { movie -> movie.title }
                     "Z-A" -> it.sortedByDescending { movie -> movie.title }
-                    "Earliest - Latest" -> it.sortedBy { movie -> movie.year }
-                    "Highest - Lowest Rating" -> it.sortedByDescending { movie -> movie.rating }
+                    "Earliest - Latest" -> it.sortedBy { movie -> movie.release_date }
+                    "Highest - Lowest Rating" -> it.sortedByDescending { movie -> movie.id } // TODO: Use actual rating
                     else -> it
                 }
             }
@@ -159,9 +162,10 @@ fun MovieItem(movie: Movie, navController: NavController) {
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = movie.imageResId),
+        AsyncImage(
+            model = movie.getFullImageUrl(),
             contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -177,7 +181,7 @@ fun MovieItem(movie: Movie, navController: NavController) {
                 color = Color.Black
             )
             Text(
-                text = "${movie.year} • ${movie.genre}",
+                text = "${movie.release_date} • ${movie.adult}",
                 fontSize = 16.sp,
                 color = Color.Gray
             )

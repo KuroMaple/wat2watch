@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.team1.wat2watch.data.model.Movie
+import utils.Movie
 import com.team1.wat2watch.ui.SwipeExample.Constants.cornerRadiusBig
 import com.team1.wat2watch.ui.SwipeExample.Constants.normalElevation
 
@@ -131,6 +131,8 @@ fun MovieCardPreview() {
         overview = "Chihiro wanders into a magical world where a witch rules -- and those who disobey her are turned into animals.",
         poster_path = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
         adult = false,
+        release_date = "2001",
+        id = 123,
     )
 
     // Preview of the DraggableMovieCard with sample movie data

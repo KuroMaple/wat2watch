@@ -37,11 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.home.HomeViewModel
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.watchlist.WatchlistViewModel
 import com.team1.wat2watch.ui.navbar.NavBar
+import utils.Movie
 
 @Composable
 fun MovieDetailsScreen(movie: Movie, navController: NavController) {
@@ -56,13 +58,13 @@ fun MovieDetailsScreen(movie: Movie, navController: NavController) {
                 .fillMaxWidth()
                 .height(350.dp)
         ) {
-            Image(
-                painter = painterResource(id = movie.imageResId),
+            AsyncImage(
+                model = movie.getFullImageUrl(),
                 contentDescription = movie.title,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
             )
-
             IconButton(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier
@@ -91,7 +93,7 @@ fun MovieDetailsScreen(movie: Movie, navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "${movie.year} • ${movie.genre} • 2h 30m",
+            text = "${movie.release_date} • ${movie.adult} • 2h 30m",
             fontSize = 16.sp,
             color = Color.Gray,
             textAlign = TextAlign.Center
@@ -104,7 +106,7 @@ fun MovieDetailsScreen(movie: Movie, navController: NavController) {
         ) {
             Icon(imageVector = Icons.Filled.Star, contentDescription = "Rating", tint = Color.Yellow)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "${movie.rating}/10", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = "10/10", fontSize = 18.sp, fontWeight = FontWeight.Bold) // todo: Remove hard coding
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -137,6 +139,13 @@ fun MovieDetailsScreen(movie: Movie, navController: NavController) {
 private fun MovieDetailsPreview() {
     val context = LocalContext.current
     val fakeNavController = remember { NavController(context) }
-    val fakeMovie = remember { Movie(1,"",1,"",1.2f,1) }
+    val fakeMovie = remember { Movie(
+        title = "Spirited Away",
+        overview = "Chihiro wanders into a magical world where a witch rules -- and those who disobey her are turned into animals.",
+        poster_path = "https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg?20200913095930",
+        adult = false,
+        release_date = "2001",
+        id = 123,
+    ) }
     MovieDetailsScreen(fakeMovie, fakeNavController)
 }

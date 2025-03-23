@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.team1.wat2watch.BuildConfig
 import com.team1.wat2watch.R
-import com.team1.wat2watch.data.model.Movie
 import com.team1.wat2watch.ui.SwipeExample.SwipeableCard
 
 
@@ -54,7 +53,7 @@ fun MatchScreen(navController: NavController,
             TopNavigationBar(navController = navController)
         },
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(onUndoClick = {viewModel.triggerUndo()})
         }
     ){ paddingValues ->
         Box(
@@ -64,7 +63,8 @@ fun MatchScreen(navController: NavController,
             contentAlignment = Alignment.Center
         ) {
             SwipeableCard(
-                dataSource = movies
+                dataSource = movies,
+                matchViewModel = viewModel
             )
         }
     }
@@ -104,7 +104,9 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(
+    onUndoClick: () -> Unit
+) {
     Row (
         modifier = Modifier
             .fillMaxWidth()
@@ -119,7 +121,8 @@ fun BottomNavigationBar() {
                 .width(104.dp)
                 .height(40.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xffd9d9d9)),
+                .background(Color(0xffd9d9d9))
+                .clickable(onClick = onUndoClick),
         ) {
             Image(
                 painter = painterResource(id = R.drawable.image24),
@@ -135,7 +138,10 @@ fun BottomNavigationBar() {
                 color = Color.Black,
                 textAlign = TextAlign.Center,
                 style = TextStyle(fontSize = 18.sp),
-                modifier = Modifier.align(Alignment.Center).padding(start = 10.dp)
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(start = 10.dp)
+
             )
         }
 
@@ -173,38 +179,6 @@ fun BottomNavigationBar() {
 @Preview(showBackground = true, widthDp = 412, heightDp = 840)
 @Composable
 fun MatchScreenPreview() {
-    val movieList = listOf(
-        Movie(
-            title = "Inception",
-            overview = "A mind-bending thriller about dream thieves.",
-            poster_path = "inception_poster_url",
-            adult = false
-        ),
-        Movie(
-            title = "The Dark Knight",
-            overview = "Batman faces his most dangerous foe, the Joker.",
-            poster_path = "dark_knight_poster_url",
-            adult = true
-        ),
-        Movie(
-            title = "The Matrix",
-            overview = "A hacker discovers the shocking truth about reality.",
-            poster_path = "matrix_poster_url",
-            adult = true
-        ),
-        Movie(
-            title = "Toy Story",
-            overview = "A group of toys come to life when their owner isn't around.",
-            poster_path = "toy_story_poster_url",
-            adult = false
-        ),
-        Movie(
-            title = "The Shawshank Redemption",
-            overview = "Two men form an unlikely friendship in prison.",
-            poster_path = "shawshank_poster_url",
-            adult = true
-        )
-    )
     val context = LocalContext.current
     val fakeNavController = remember { NavController(context) }
     MatchScreen(fakeNavController)

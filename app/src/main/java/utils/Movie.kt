@@ -1,12 +1,16 @@
-package com.team1.wat2watch.data.model
+package utils
 
 import com.team1.wat2watch.BuildConfig
 
 data class Movie(
-    val title: String,
-    val overview: String,
-    val poster_path: String?,
-    val adult: Boolean,
+    val id: Int = 0,
+    val title: String = "",
+    val release_date: String = "",
+    val poster_path: String? = "",
+    val overview: String = "",
+    val adult: Boolean = false,
+    val addedOn: String = "",
+    // Todo: Fetch run time seperately for displaying purposes in future
 ) {
     fun getFullImageUrl(): String {
         // Build the full image URL using the base URL from BuildConfig otherwise return the placeholder URL

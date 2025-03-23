@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.math.ceil
 import com.google.firebase.firestore.FieldValue
+import utils.Movie
 
 object FirestoreHelper {
 
@@ -24,7 +25,7 @@ object FirestoreHelper {
 
     data class MatchHistoryItem(
         val sessionId: String = "",
-        val selectedMovie: MovieItem = MovieItem(),
+        val selectedMovie: Movie = Movie(),
         val users: List<UserInfo> = emptyList()
     )
 
@@ -101,18 +102,20 @@ object FirestoreHelper {
      * -----------------------------------------------------------------------------------------
      * Adds a movie to the user's watchlist
      */
-
-    fun addToWatchList(movieId: String, title: String, year: String, runtime: String, poster: String, summary: String) {
+    // TODO: Pass blank run time
+    fun addToWatchList(movieId: String, title: String, release_date: String,
+                       poster_path: String, overview: String, adult: Boolean) {
         val uid = getCurrentUserUid() ?: return
         val watchListRef = db.collection("users").document(uid).collection("watchList")
 
         val movieData = hashMapOf(
+            "id" to movieId,
             "title" to title,
-            "year" to year,
-            "runtime" to runtime,
-            "poster" to poster,
-            "summary" to summary,
-            "addedOn" to System.currentTimeMillis()
+            "release_date" to release_date,
+            "poster_path" to poster_path,
+            "overview" to overview,
+            "adult" to adult,
+            "addedOn" to System.currentTimeMillis().toString()
         )
 
         watchListRef.document(movieId).set(movieData)
@@ -126,25 +129,28 @@ object FirestoreHelper {
 
     /**
      * -----------------------------------------------------------------------------------------
-     * Gets all movies from user's watchlist, they will be in a list of MovieItem structure
+     * Gets all movies from user's watchlist, they will be in a list of Movie structure
      */
 
-    fun getUserWatchlist(userId: String, onSuccess: (List<MovieItem>) -> Unit, onFailure: (Exception) -> Unit) {
-        val watchListRef = db.collection("users").document(userId).collection("watchList")
+    fun getUserWatchlist(onSuccess: (List<Movie>) -> Unit, onFailure: (Exception) -> Unit) {
+        val currentUser = getCurrentUserUid() ?: return
+        val watchListRef = db.collection("users").document(currentUser).collection("watchList")
 
         watchListRef.get()
             .addOnSuccessListener { result ->
-                val watchlist = mutableListOf<MovieItem>()
+                val watchlist = mutableListOf<Movie>()
                 for (document in result) {
+                    val id = document.getString("id")?.toIntOrNull() ?: -1
                     val title = document.getString("title") ?: ""
-                    val year = document.getString("year") ?: ""
-                    val runtime = document.getString("runtime") ?: ""
-                    val poster = document.getString("poster") ?: ""
-                    val summary = document.getString("summary") ?: ""
+                    val release_date = document.getString("release_date") ?: ""
+//                    val runtime = document.getString("runtime") ?: ""
+                    val poster_path = document.getString("poster_path") ?: ""
+                    val overview = document.getString("overview") ?: ""
+                    val adult = document.getBoolean("adult") ?: false
                     val addedOn = document.getString("addedOn") ?: ""
 
-                    val MovieItem = MovieItem(title, year, runtime, poster, summary, addedOn)
-                    watchlist.add(MovieItem)
+                    val movie = Movie(id.toInt(), title, release_date, poster_path, overview, adult, addedOn)
+                    watchlist.add(movie)
                 }
                 Log.d("FirestoreHelper", "Fetched watchlist for User")
                 onSuccess(watchlist)
@@ -160,18 +166,20 @@ object FirestoreHelper {
      * Adds an ended session to the user's match history (should be called from session end)
      */
 
-    fun addMatchHistory(sessionId: String, movie: MovieItem, users: List<UserInfo>) {
+    fun addMatchHistory(sessionId: String, movie: Movie, users: List<UserInfo>) {
         val uid = getCurrentUserUid() ?: return
         val matchHistoryRef = db.collection("users").document(uid).collection("matchHistory")
 
         val matchData = hashMapOf(
             "sessionId" to sessionId,
             "selectedMovie" to hashMapOf(
+                "id" to movie.id,
                 "title" to movie.title,
-                "year" to movie.year,
-                "runtime" to movie.runtime,
-                "poster" to movie.poster,
-                "summary" to movie.summary,
+                "release_date" to movie.release_date,
+//                "runtime" to movie.,
+                "poster_path" to movie.poster_path,
+                "overview" to movie.overview,
+                "adult" to movie.adult,
                 "addedOn" to System.currentTimeMillis()
             ),
             "users" to users.map { user ->
@@ -206,12 +214,14 @@ object FirestoreHelper {
                     val sessionId = document.getString("sessionId") ?: ""
 
                     val movieData = document.get("selectedMovie") as? Map<String, Any> ?: emptyMap()
-                    val movie = MovieItem(
+                    val movie = Movie(
+                        id = movieData["id"] as? Int ?: 0,
                         title = movieData["title"] as? String ?: "",
-                        year = movieData["year"] as? String ?: "",
-                        runtime = movieData["runtime"] as? String ?: "",
-                        poster = movieData["poster"] as? String ?: "",
-                        summary = movieData["summary"] as? String ?: "",
+                        release_date = movieData["release_date"] as? String ?: "",
+//                        runtime = movieData["runtime"] as? String ?: "",
+                        poster_path = movieData["poster_path"] as? String ?: "",
+                        overview = movieData["overview"] as? String ?: "",
+                        adult = movieData["adult"] as? Boolean ?: false,
                         addedOn = movieData["addedOn"]?.toString() ?: ""
                     )
 

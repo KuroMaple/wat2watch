@@ -2,13 +2,22 @@ package com.team1.wat2watch.ui.match
 
 import androidx.lifecycle.ViewModel
 import com.team1.wat2watch.data.api.RetrofitInstance
-import com.team1.wat2watch.data.model.Movie
+import utils.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class MatchViewModel: ViewModel() {
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies: StateFlow<List<Movie>> = _movies // Exposed for the UI layer
+
+    private val _undoSwipe = MutableStateFlow(false)
+    val undoSwipe: StateFlow<Boolean> = _undoSwipe
+    fun triggerUndo() {
+        _undoSwipe.value = true
+    }
+    fun resetTriggerUndo() {
+        _undoSwipe.value = false
+    }
 
     suspend fun fetchMovies(
         apiKey: String,
