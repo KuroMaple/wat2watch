@@ -25,10 +25,10 @@ git clone <https>
 File > Sync Projects with Gradle Files
 
 ### Step 3: Setup Android Emulator
-Vanilla API35)
+Vanilla (API35)
 
 ## Setup Google Sign In
-*I am unsure if this is something every team member must do but in case you guys encounte errors, here are some troubleshooting tips*
+*I am unsure if this is something every team member must do but in case you guys encounter errors, here are some troubleshooting tips*
 
 ### Generate a new keystore
 Open a terminal and run:
@@ -117,7 +117,7 @@ Click the play icon in the top bar or go to Run > Run app
 
 ## 👥 Team Members
 - **[Hassan Hashmi]** – h4hashmi, 20831242, kuromaple
-- **[Asma Ansari]** – a33ansar, 20879999, asma71612
+- **[Asma Ansari]** – a33ansar, 20879999, asma71612/a-ansari02
 - **[Sungmin Kim]** – sm27kim, 20821022, sungminkim627
 - **[Caitlin Kwan]** – c32kwan, 20886817, caitlinkwan
 - **[Jagan Sahu]** – jsahu, 20840571, jagansahu

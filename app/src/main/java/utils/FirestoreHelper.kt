@@ -53,6 +53,7 @@ object FirestoreHelper {
             "uid" to uid,
             "email" to email,
             "username" to username,
+            "dateJoined" to FieldValue.serverTimestamp()
         )
 
         db.collection("users").document(uid)
@@ -338,10 +339,4 @@ object FirestoreHelper {
             onFailure(e)
         }
     }
-
-
-
-
-
-
 }

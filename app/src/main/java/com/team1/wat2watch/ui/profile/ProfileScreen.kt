@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,13 +20,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.team1.wat2watch.R
 
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
+    viewModel: ProfileScreenViewModel = viewModel()
 ) {
     var reWatchToggle by remember { mutableStateOf(false) }
+
+    // Observe the username from the ViewModel
+    val username = viewModel.username.observeAsState("User").value
+    val creationDate = viewModel.creationDate.observeAsState("12/24").value
 
     Column(
         modifier = modifier
@@ -69,7 +76,7 @@ fun ProfileScreen(
                     Spacer(modifier = modifier.height(16.dp))
 
                     Text(
-                        text = "Caitlin",
+                        text = username, // Using dynamic username from FireStore
                         style = TextStyle(
                             fontSize = 22.sp,
                             fontFamily = FontFamily(Font(R.font.nunito_sans_7pt_condensed_light)),
@@ -79,7 +86,7 @@ fun ProfileScreen(
                     )
 
                     Text(
-                        text = "Wat2Watcher since 12/24",
+                        text = "Wat2Watcher since $creationDate",
                         style = TextStyle(
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(R.font.nunito_sans_7pt_condensed_light)),

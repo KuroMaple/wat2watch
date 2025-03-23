@@ -62,22 +62,20 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MyApp(viewModel = viewModel) {
+            MyApp(viewModel = viewModel, signInWithGoogle = {
                 val signInIntent = googleSignInClient.signInIntent
                 googleSignInLauncher.launch(signInIntent)
-            }
+            })
         }
     }
 }
 
 @Composable
-fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
+fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit) {
     val navController = rememberNavController()
-    val loginViewModel = LoginViewModel()
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
-
             Scaffold(
                 bottomBar = {
                     // Track navigation changes properly
@@ -89,36 +87,36 @@ fun MyApp(viewModel: LoginViewModel, kFunction0: () -> Unit) {
                     }
                 }
             ) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = "splash",
-                modifier = Modifier.padding(innerPadding)) {
-                composable("splash") { SplashScreen(navController) }
-                composable("login") {
-                    LoginScreen(
-                    modifier = Modifier,
-                    viewModel = viewModel,
+                NavHost(
                     navController = navController,
-                    onGoogleSignInClicked = {})
-                }
-                composable("home") { HomeScreen(navController = navController) }
-                composable("history") { HistoryScreen() }
-                composable("signup") { SignUpScreen(navController = navController) }
-                composable("profile") { ProfileScreen() }
-                composable("match") { MatchScreen(navController) }
-                composable("search") { WatchlistScreen(navController = navController) }
-                composable("movieDetails/{movieId}") { backStackEntry ->
-                    val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
-                    val viewModel = WatchlistViewModel()
-                    val movie = movieId?.let { viewModel.getMovieById(it) }
+                    startDestination = "splash",
+                    modifier = Modifier.padding(innerPadding)) {
+                    composable("splash") { SplashScreen(navController) }
+                    composable("login") {
+                        LoginScreen(
+                            modifier = Modifier,
+                            viewModel = viewModel,
+                            navController = navController,
+                            onGoogleSignInClicked = signInWithGoogle) // Pass the function here
+                    }
+                    composable("home") { HomeScreen(navController = navController) }
+                    composable("history") { HistoryScreen() }
+                    composable("signup") { SignUpScreen(navController = navController) }
+                    composable("profile") { ProfileScreen() }
+                    composable("match") { MatchScreen(navController) }
+                    composable("search") { WatchlistScreen(navController = navController) }
+                    composable("movieDetails/{movieId}") { backStackEntry ->
+                        val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
+                        val viewModel = WatchlistViewModel()
+                        val movie = movieId?.let { viewModel.getMovieById(it) }
 
-                    if (movie != null) {
-                        MovieDetailsScreen(movie = movie, navController = navController)
-                    } else {
-                        Text(text = "Movie not found")
+                        if (movie != null) {
+                            MovieDetailsScreen(movie = movie, navController = navController)
+                        } else {
+                            Text(text = "Movie not found")
+                        }
                     }
                 }
-            }
             }
         }
     }
