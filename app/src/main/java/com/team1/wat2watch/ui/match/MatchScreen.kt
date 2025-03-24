@@ -43,6 +43,7 @@ fun MatchScreen(
 ) {
     val movies = viewModel.movies.collectAsState().value
     val showInfoModal = viewModel.showInfoModal.collectAsState().value
+    val username = viewModel.username.collectAsState().value
 
     LaunchedEffect(Unit) {
         viewModel.fetchMovies(
@@ -51,7 +52,12 @@ fun MatchScreen(
     }
 
     Scaffold(
-        topBar = { TopNavigationBar(navController = navController) },
+        topBar = {
+            TopNavigationBar(
+                navController = navController,
+                username = username
+            )
+                 },
         bottomBar = {
             BottomNavigationBar(
                 onUndoClick = { viewModel.triggerUndo() },
@@ -79,7 +85,11 @@ fun MatchScreen(
 }
 
 @Composable
-fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController) {
+fun TopNavigationBar(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    username: String = "User"
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -101,7 +111,7 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
         )
 
         Text(
-            text = "Caitlin’s Match Party",
+            text = "$username's Match Party",
             color = Color.Black,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier

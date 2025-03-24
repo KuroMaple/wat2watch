@@ -1,6 +1,8 @@
 package com.team1.wat2watch.ui.match
 
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.team1.wat2watch.data.api.RetrofitInstance
 import utils.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +18,16 @@ class MatchViewModel: ViewModel() {
     private val _showInfoModal = MutableStateFlow(false)
     val showInfoModal: StateFlow<Boolean> = _showInfoModal
 
+    private val _username = MutableStateFlow<String>("User")
+    val username: StateFlow<String> = _username
+
+    private val auth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
+
+    init {
+        loadUserData()
+    }
+
     fun triggerUndo() {
         _undoSwipe.value = true
     }
@@ -30,6 +42,20 @@ class MatchViewModel: ViewModel() {
 
     fun hideInfoModal() {
         _showInfoModal.value = false
+    }
+
+    private fun loadUserData() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            firestore.collection("users")
+                .document(currentUser.uid)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        _username.value = document.getString("username") ?: "User"
+                    }
+                }
+        }
     }
 
     suspend fun fetchMovies(
