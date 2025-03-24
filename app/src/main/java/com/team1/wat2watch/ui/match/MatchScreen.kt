@@ -36,11 +36,14 @@ import com.team1.wat2watch.BuildConfig
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.SwipeExample.SwipeableCard
 
-
 @Composable
-fun MatchScreen(navController: NavController,
-                viewModel: MatchViewModel = MatchViewModel()) {
+fun MatchScreen(
+    navController: NavController,
+    viewModel: MatchViewModel = MatchViewModel()
+) {
     val movies = viewModel.movies.collectAsState().value
+    val showInfoModal = viewModel.showInfoModal.collectAsState().value
+    val username = viewModel.username.collectAsState().value
 
     LaunchedEffect(Unit) {
         viewModel.fetchMovies(
@@ -48,12 +51,18 @@ fun MatchScreen(navController: NavController,
         )
     }
 
-    Scaffold (
+    Scaffold(
         topBar = {
-            TopNavigationBar(navController = navController)
-        },
+            TopNavigationBar(
+                navController = navController,
+                username = username
+            )
+                 },
         bottomBar = {
-            BottomNavigationBar(onUndoClick = {viewModel.triggerUndo()})
+            BottomNavigationBar(
+                onUndoClick = { viewModel.triggerUndo() },
+                onInfoClick = { viewModel.showInfoModal() }
+            )
         }
     ){ paddingValues ->
         Box(
@@ -66,12 +75,21 @@ fun MatchScreen(navController: NavController,
                 dataSource = movies,
                 matchViewModel = viewModel
             )
+
+            // Show the info modal when needed
+            if (showInfoModal) {
+                InfoModal(onDismiss = { viewModel.hideInfoModal() })
+            }
         }
     }
 }
 
 @Composable
-fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController) {
+fun TopNavigationBar(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    username: String = "User"
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -93,7 +111,7 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
         )
 
         Text(
-            text = "Caitlin’s Match Party",
+            text = "$username's Match Party",
             color = Color.Black,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
@@ -105,7 +123,8 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
 
 @Composable
 fun BottomNavigationBar(
-    onUndoClick: () -> Unit
+    onUndoClick: () -> Unit,
+    onInfoClick: () -> Unit
 ) {
     Row (
         modifier = Modifier
@@ -152,8 +171,8 @@ fun BottomNavigationBar(
                 .align(Alignment.CenterVertically)
                 .width(204.dp)
                 .height(40.dp)
-        )
-        {
+                .clickable(onClick = onInfoClick)
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.info_icon),
                 contentDescription = "info icon",
@@ -175,7 +194,6 @@ fun BottomNavigationBar(
     }
 }
 
-
 @Preview(showBackground = true, widthDp = 412, heightDp = 840)
 @Composable
 fun MatchScreenPreview() {
@@ -183,5 +201,3 @@ fun MatchScreenPreview() {
     val fakeNavController = remember { NavController(context) }
     MatchScreen(fakeNavController)
 }
-
-

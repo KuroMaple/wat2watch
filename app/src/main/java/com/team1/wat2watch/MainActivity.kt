@@ -9,7 +9,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +29,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
 import com.team1.wat2watch.ui.login.LoginViewModel
@@ -65,14 +73,58 @@ class MainActivity : ComponentActivity() {
             MyApp(viewModel = viewModel, signInWithGoogle = {
                 val signInIntent = googleSignInClient.signInIntent
                 googleSignInLauncher.launch(signInIntent)
-            })
+            },
+                startDestination = "login")
         }
     }
 }
 
 @Composable
-fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit) {
+fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit, startDestination: String) {
     val navController = rememberNavController()
+
+    // Track auth state changes
+    var isLoggedIn by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser != null) }
+
+    // This effect sets up a listener for auth state changes
+    DisposableEffect(Unit) {
+        val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val currentUser = firebaseAuth.currentUser
+            val newLoggedInState = currentUser != null
+
+            // Only update if there's an actual change to prevent unnecessary recomposition
+            if (isLoggedIn != newLoggedInState) {
+                Log.d("AuthState", "Auth state changed - User logged in: $newLoggedInState")
+                isLoggedIn = newLoggedInState
+            }
+        }
+
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener)
+
+        onDispose {
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener)
+        }
+    }
+
+    // This effect handles navigation based on auth state
+    LaunchedEffect(isLoggedIn) {
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+        Log.d("AuthNavigation", "Current route: $currentRoute, isLoggedIn: $isLoggedIn")
+
+        if (!isLoggedIn && currentRoute != "login" && currentRoute != "signup" && currentRoute != null) {
+            // If logged out and not on login/signup screens, navigate to login
+            Log.d("AuthNavigation", "Navigating to login because user signed out")
+            navController.navigate("login") {
+                // Clear the entire back stack
+                popUpTo(0) { inclusive = true }
+            }
+        } else if (isLoggedIn && currentRoute == "login") {
+            // If logged in and on login screen, navigate to home
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
@@ -89,8 +141,9 @@ fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit) {
             ) { innerPadding ->
                 NavHost(
                     navController = navController,
-                    startDestination = "splash",
-                    modifier = Modifier.padding(innerPadding)) {
+                    startDestination = startDestination,
+                    modifier = Modifier.padding(innerPadding)
+                ) {
                     composable("splash") { SplashScreen(navController) }
                     composable("login") {
                         LoginScreen(
@@ -102,7 +155,7 @@ fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit) {
                     composable("home") { HomeScreen(navController = navController) }
                     composable("history") { HistoryScreen() }
                     composable("signup") { SignUpScreen(navController = navController) }
-                    composable("profile") { ProfileScreen() }
+                    composable("profile") { ProfileScreen(navController = navController) }
                     composable("match") { MatchScreen(navController) }
                     composable("search") { WatchlistScreen(navController = navController) }
                     composable("movieDetails/{movieId}") { backStackEntry ->
