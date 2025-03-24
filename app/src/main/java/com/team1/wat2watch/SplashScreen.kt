@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 val nunitoSansFont = FontFamily(
@@ -36,9 +37,15 @@ val nunitoSansFont = FontFamily(
 fun SplashScreen(navController: NavController) {
     LaunchedEffect(Unit) {
         delay(2000)  // Show splash screen for 2 seconds
-        // Navigate to the Login screen (you can use an Intent or a state)
-        navController.navigate("login") {
-            popUpTo("splash") { inclusive = true }  // Remove splash screen from backstack
+
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            navController.navigate("home") {
+                popUpTo("splash") { inclusive = true }
+            }
+        } else {
+            navController.navigate("login") {
+                popUpTo("splash") { inclusive = true }
+            }
         }
     }
 
