@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.team1.wat2watch.R
-
+import com.team1.wat2watch.ui.match.MatchViewModel
 
 
 val nunitoSansFont = FontFamily(
@@ -46,7 +46,8 @@ val rainyHeartsFont = FontFamily(
 
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    matchViewModel: MatchViewModel
 ) {
     val viewModel = HomeViewModel()
     val modifier = Modifier
@@ -139,16 +140,25 @@ fun HomeScreen(
                         fontFamily = nunitoSansFont
                     ))
                 Spacer(modifier = Modifier.height(40.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.wat2watch_home_add_party_icon),
-                    contentDescription = "Join Party Icon",
-                    modifier = Modifier
-                        .requiredWidth(103.dp)
-                        .requiredHeight(103.dp),
-                    tint = Color(0xFFC9DBEF)
-                )
-                Spacer(modifier = Modifier.height(30.dp))
-                StartPartyButton(navController)
+                CreatePartyButton(navController, matchViewModel)
+//                Icon(
+//                    painter = painterResource(id = R.drawable.wat2watch_home_add_party_icon),
+//                    contentDescription = "Join Party Icon",
+//                    modifier = Modifier
+//                        .requiredWidth(103.dp)
+//                        .requiredHeight(103.dp),
+//                    tint = Color(0xFFC9DBEF)
+//                )
+                Spacer(modifier = Modifier.height(45.dp))
+                Text(
+                    text = "OR",
+                    color = Color.Black,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = nunitoSansFont
+                    ))
+                Spacer(modifier = Modifier.height(40.dp))
+                SoloSwipeButton(navController, matchViewModel)
             }
 
 
@@ -161,7 +171,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     val context = LocalContext.current
     val fakeNavController = remember { NavController(context) }
-    HomeScreen(fakeNavController)
+    HomeScreen(fakeNavController, MatchViewModel())
 }
 
 @Composable
@@ -210,11 +220,11 @@ fun JoinPartyButton(/*Add Params here when behaviour defined*/){
 }
 
 @Composable
-fun StartPartyButton(navController: NavController){
+fun CreatePartyButton(navController: NavController, matchViewModel: MatchViewModel){
     InputChip(
         label = {
             Text(
-                text = "Start a party",
+                text = "Create a party",
                 color = Color.Black,
                 textAlign = TextAlign.Center,
                 style = TextStyle(
@@ -231,6 +241,35 @@ fun StartPartyButton(navController: NavController){
         ),
         selected = true,
         onClick = {
+            matchViewModel.setSolo(false)
+            navController.navigate("match")
+        },
+    )
+}
+
+@Composable
+fun SoloSwipeButton(navController: NavController, matchViewModel: MatchViewModel){
+    InputChip(
+        label = {
+            Text(
+                text = "Solo Swipe Session",
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontFamily = nunitoSansFont
+                )
+            )
+        },
+        shape = RoundedCornerShape(8.dp),
+        colors = InputChipDefaults.inputChipColors(
+            containerColor = Color(0xFFC9DBEF),
+            selectedContainerColor = Color(0xFFC9DBEF),
+            disabledContainerColor = Color(0xFFC9DBEF)
+        ),
+        selected = true,
+        onClick = {
+            matchViewModel.setSolo(true)
             navController.navigate("match")
         },
     )

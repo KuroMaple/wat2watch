@@ -9,16 +9,10 @@ import utils.Movie
 
 object FirestoreHelper {
 
-
-    data class UserInfo(
-        val uid: String = "",
-        val username: String = ""
-    )
-
     data class MatchHistoryItem(
         val sessionId: String = "",
         val selectedMovie: Movie = Movie(),
-        val users: List<UserInfo> = emptyList()
+        val users: List<String> = emptyList()
     )
 
     private val db = FirebaseFirestore.getInstance()
@@ -173,7 +167,7 @@ object FirestoreHelper {
      * Adds an ended session to the user's match history (should be called from session end)
      */
 
-    fun addMatchHistory(sessionId: String, movie: Movie, users: List<UserInfo>) {
+    fun addMatchHistory(sessionId: String, movie: Movie, users: List<String>) {
         val uid = getCurrentUserUid() ?: return
         val matchHistoryRef = db.collection("users").document(uid).collection("matchHistory")
 
@@ -189,12 +183,7 @@ object FirestoreHelper {
                 "adult" to movie.adult,
                 "addedOn" to System.currentTimeMillis()
             ),
-            "users" to users.map { user ->
-                hashMapOf(
-                    "uid" to user.uid,
-                    "username" to user.username
-                )
-            }
+            "users" to users
         )
 
         matchHistoryRef.document(sessionId).set(matchData)
@@ -232,13 +221,8 @@ object FirestoreHelper {
                         addedOn = movieData["addedOn"]?.toString() ?: ""
                     )
 
-                    val usersData = document.get("users") as? List<Map<String, Any>> ?: emptyList()
-                    val users = usersData.map { userMap ->
-                        UserInfo(
-                            uid = userMap["uid"] as? String ?: "",
-                            username = userMap["username"] as? String ?: ""
-                        )
-                    }
+                    val users = document.get("users") as? List<String> ?: emptyList()
+
 
                     val matchHistoryItem = MatchHistoryItem(sessionId, movie, users)
                     matchHistoryList.add(matchHistoryItem)
@@ -294,6 +278,10 @@ object FirestoreHelper {
                     if (document.exists()) {
                         val users = document.get("users") as? List<String> ?: emptyList()
                         val newCountGoal = ceil((users.size + 1) / 2.0).toInt()  // Majority
+
+                        if (users.size >= 8) {
+                            onFailure(Exception("Session is full"))
+                        }
 
                         sessionRef.update(
                             "users", FieldValue.arrayUnion(username), // Store username instead of UID

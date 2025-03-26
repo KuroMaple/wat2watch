@@ -26,6 +26,7 @@ import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.match.MatchScreen
+import com.team1.wat2watch.ui.match.MatchViewModel
 import com.team1.wat2watch.ui.navbar.NavBar
 import com.team1.wat2watch.ui.navbar.NavBarViewModel
 import com.team1.wat2watch.ui.signup.SignUpScreen
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit) {
     val navController = rememberNavController()
+    val matchViewModel = MatchViewModel()
 
     MaterialTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
@@ -99,11 +101,11 @@ fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit) {
                             navController = navController,
                             onGoogleSignInClicked = signInWithGoogle) // Pass the function here
                     }
-                    composable("home") { HomeScreen(navController = navController) }
+                    composable("home") { HomeScreen(navController = navController, matchViewModel = matchViewModel) }
                     composable("history") { HistoryScreen() }
                     composable("signup") { SignUpScreen(navController = navController) }
                     composable("profile") { ProfileScreen() }
-                    composable("match") { MatchScreen(navController) }
+                    composable("match") { MatchScreen(navController, viewModel = matchViewModel) }
                     composable("search") { WatchlistScreen(navController = navController) }
                     composable("movieDetails/{movieId}") { backStackEntry ->
                         val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()

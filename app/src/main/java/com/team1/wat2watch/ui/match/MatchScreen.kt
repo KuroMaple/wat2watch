@@ -3,7 +3,9 @@ package com.team1.wat2watch.ui.match
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -19,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,12 +40,18 @@ import androidx.navigation.NavController
 import com.team1.wat2watch.BuildConfig
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.SwipeExample.SwipeableCard
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.withIndex
 
 
 @Composable
 fun MatchScreen(navController: NavController,
-                viewModel: MatchViewModel = MatchViewModel()) {
+                viewModel: MatchViewModel) {
     val movies = viewModel.movies.collectAsState().value
+    val isSolo by viewModel.isSolo.collectAsState()  // Track solo/group state
+    val participants = MutableStateFlow(listOf("Alice", "Bob", "Charlie")) // Example list of people in group
+
 
     LaunchedEffect(Unit) {
         viewModel.fetchMovies(
@@ -50,7 +61,24 @@ fun MatchScreen(navController: NavController,
 
     Scaffold (
         topBar = {
-            TopNavigationBar(navController = navController)
+            Column {
+                TopNavigationBar(navController = navController, viewModel = viewModel)
+
+                // Show participant names if it's a group match
+                if (!isSolo) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(count = Int.MAX_VALUE) { index ->
+                            val item = participants.value[index % participants.value.size]
+                            ParticipantChip(item)
+                        }
+                    }
+                }
+            }
         },
         bottomBar = {
             BottomNavigationBar(onUndoClick = {viewModel.triggerUndo()})
@@ -71,7 +99,8 @@ fun MatchScreen(navController: NavController,
 }
 
 @Composable
-fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController) {
+fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController,
+                     viewModel: MatchViewModel) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -91,9 +120,15 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
             modifier = Modifier
                 .fillMaxSize()
         )
-
+        var text = ""
+        val isSolo by viewModel.isSolo.collectAsState()
+        text = if (isSolo) {
+            "Solo Matching"
+        } else {
+            "Group Match"
+        }
         Text(
-            text = "Caitlin’s Match Party",
+            text = text,
             color = Color.Black,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
@@ -175,13 +210,29 @@ fun BottomNavigationBar(
     }
 }
 
+/*
+* Helper For Displaying Participant Names in group swipe session
+* */
+@Composable
+fun ParticipantChip(name: String) {
+    Text(
+        text = name,
+        color = Color.White,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier
+            .background(Color(0xFF007AFF), shape = RoundedCornerShape(16.dp))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    )
+}
+
+
 
 @Preview(showBackground = true, widthDp = 412, heightDp = 840)
 @Composable
 fun MatchScreenPreview() {
     val context = LocalContext.current
     val fakeNavController = remember { NavController(context) }
-    MatchScreen(fakeNavController)
+    MatchScreen(fakeNavController, MatchViewModel())
 }
 
 

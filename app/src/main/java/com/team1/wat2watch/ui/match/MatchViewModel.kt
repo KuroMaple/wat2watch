@@ -7,6 +7,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class MatchViewModel: ViewModel() {
+    private val _isSoloSwipe = MutableStateFlow(true)
+    val isSolo: StateFlow<Boolean> = _isSoloSwipe
+
+    fun setSolo(isSolo: Boolean) {
+        _isSoloSwipe.value = isSolo
+    }
+
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies: StateFlow<List<Movie>> = _movies // Exposed for the UI layer
 
