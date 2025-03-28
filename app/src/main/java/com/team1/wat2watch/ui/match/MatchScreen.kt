@@ -43,6 +43,7 @@ import com.team1.wat2watch.ui.SwipeExample.SwipeableCard
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.withIndex
+import wat2watch.utils.FirestoreHelper
 
 
 @Composable
@@ -50,7 +51,7 @@ fun MatchScreen(navController: NavController,
                 viewModel: MatchViewModel) {
     val movies = viewModel.movies.collectAsState().value
     val isSolo by viewModel.isSolo.collectAsState()  // Track solo/group state
-    val participants = MutableStateFlow(listOf("Alice", "Bob", "Charlie")) // Example list of people in group
+    val participants by viewModel.participants.collectAsState()
 
 
     LaunchedEffect(Unit) {
@@ -64,20 +65,23 @@ fun MatchScreen(navController: NavController,
             Column {
                 TopNavigationBar(navController = navController, viewModel = viewModel)
 
-                // Show participant names if it's a group match
-                if (!isSolo) {
-                    LazyRow(
+                if (participants.isNotEmpty()) {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(count = Int.MAX_VALUE) { index ->
-                            val item = participants.value[index % participants.value.size]
-                            ParticipantChip(item)
+                        participants.forEach { participant ->
+                            ParticipantChip(participant)
                         }
                     }
+                } else {
+                    Text("Loading participants...")
                 }
+
+
+
             }
         },
         bottomBar = {
@@ -92,7 +96,8 @@ fun MatchScreen(navController: NavController,
         ) {
             SwipeableCard(
                 dataSource = movies,
-                matchViewModel = viewModel
+                matchViewModel = viewModel,
+                navController
             )
         }
     }
@@ -101,6 +106,8 @@ fun MatchScreen(navController: NavController,
 @Composable
 fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController,
                      viewModel: MatchViewModel) {
+    val sessionId by viewModel.sessionID.collectAsState()
+    val sessionAlias by viewModel.sessionAlias.collectAsState()
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -113,7 +120,7 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
                 .align(Alignment.CenterStart)
                 .padding(start = 16.dp, end = 16.dp)
                 .clickable{
-                    navController.navigate("home")
+                    viewModel.handleEndSession(sessionId, navController)
                 },
         )
         Box(
@@ -125,7 +132,7 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
         text = if (isSolo) {
             "Solo Matching"
         } else {
-            "Group Match"
+            sessionAlias ?: "Group Matching"
         }
         Text(
             text = text,

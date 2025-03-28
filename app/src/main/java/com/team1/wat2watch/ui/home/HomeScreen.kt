@@ -1,5 +1,6 @@
 package com.team1.wat2watch.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.match.MatchViewModel
+import wat2watch.utils.FirestoreHelper
 
 
 val nunitoSansFont = FontFamily(
@@ -130,7 +132,7 @@ fun HomeScreen(
                         .requiredWidth(width = 246.dp))
                 Spacer(modifier = Modifier.height(15.dp))
                 CodeInput(viewModel)
-                JoinPartyButton()
+                JoinPartyButton(matchViewModel, viewModel, navController)
                 Spacer(modifier = Modifier.height(45.dp))
                 Text(
                     text = "OR",
@@ -140,7 +142,7 @@ fun HomeScreen(
                         fontFamily = nunitoSansFont
                     ))
                 Spacer(modifier = Modifier.height(40.dp))
-                CreatePartyButton(navController, matchViewModel)
+                CreatePartyButton(homeViewModel = viewModel, navController, matchViewModel)
 //                Icon(
 //                    painter = painterResource(id = R.drawable.wat2watch_home_add_party_icon),
 //                    contentDescription = "Join Party Icon",
@@ -195,7 +197,13 @@ fun CodeInput(viewModel: HomeViewModel){
 }
 
 @Composable
-fun JoinPartyButton(/*Add Params here when behaviour defined*/){
+fun JoinPartyButton(
+    matchViewModel: MatchViewModel,
+    homeViewModel: HomeViewModel,
+    navController: NavController
+){
+    val sessionIdInput = homeViewModel.code.observeAsState().value ?: ""
+
     InputChip(
         label = {
             Text(
@@ -215,12 +223,17 @@ fun JoinPartyButton(/*Add Params here when behaviour defined*/){
             disabledContainerColor = Color(0xFFC9DBEF)
         ),
         selected = true,
-        onClick = {},
+        onClick = {
+            homeViewModel.onJoinPartyClick(
+                navController,
+                matchViewModel
+            )
+        },
     )
 }
 
 @Composable
-fun CreatePartyButton(navController: NavController, matchViewModel: MatchViewModel){
+fun CreatePartyButton(homeViewModel: HomeViewModel, navController: NavController, matchViewModel: MatchViewModel){
     InputChip(
         label = {
             Text(
@@ -241,8 +254,7 @@ fun CreatePartyButton(navController: NavController, matchViewModel: MatchViewMod
         ),
         selected = true,
         onClick = {
-            matchViewModel.setSolo(false)
-            navController.navigate("match")
+            homeViewModel.onCreatePartyClick(navController, matchViewModel)
         },
     )
 }
@@ -269,6 +281,15 @@ fun SoloSwipeButton(navController: NavController, matchViewModel: MatchViewModel
         ),
         selected = true,
         onClick = {
+            // Fetch the username from Firestore and set it as the participant
+            FirestoreHelper.getUserUsername(
+                onSuccess = { username ->
+                    matchViewModel.addParticipant(username)
+                },
+                onFailure = { exception ->
+                    Log.e("SignUpViewModel", "Failed to get username: ${exception.message}")
+                }
+            )
             matchViewModel.setSolo(true)
             navController.navigate("match")
         },
