@@ -102,7 +102,7 @@ fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit) {
                             onGoogleSignInClicked = signInWithGoogle) // Pass the function here
                     }
                     composable("home") { HomeScreen(navController = navController, matchViewModel = matchViewModel) }
-                    composable("history") { HistoryScreen() }
+                    composable("history") { HistoryScreen(navController = navController) }
                     composable("signup") { SignUpScreen(navController = navController) }
                     composable("profile") { ProfileScreen() }
                     composable("match") { MatchScreen(navController, viewModel = matchViewModel) }

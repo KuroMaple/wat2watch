@@ -209,7 +209,7 @@ object FirestoreHelper {
      * Gets all matches from user's match history
      */
 
-    private fun getUserMatchHistory(userId: String, onSuccess: (List<MatchHistoryItem>) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getUserMatchHistory(userId: String, onSuccess: (List<MatchHistoryItem>) -> Unit, onFailure: (Exception) -> Unit) {
         val matchHistoryRef = db.collection("users").document(userId).collection("matchHistory")
 
         matchHistoryRef.get()
