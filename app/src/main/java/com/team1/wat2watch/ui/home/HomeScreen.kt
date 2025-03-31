@@ -52,6 +52,7 @@ fun HomeScreen(
     matchViewModel: MatchViewModel
 ) {
     val viewModel = HomeViewModel()
+    val username by viewModel.username.observeAsState("User")
     val modifier = Modifier
     Column(
         modifier = Modifier
@@ -80,7 +81,7 @@ fun HomeScreen(
                     .offset(x = 20.dp, y = (40).dp),
             ) {
                 Text(
-                    text = "Good evening,",
+                    text = "Welcome,",
                     color = Color.Black,
                     style = TextStyle(
                         fontFamily = nunitoSansFont,
@@ -88,7 +89,7 @@ fun HomeScreen(
                     ),
                     modifier = modifier)
                 Text(
-                    text = "Caitlin!",
+                    text = "$username!",
                     color = Color.Black,
                     style = TextStyle(
                         fontSize = 64.sp,

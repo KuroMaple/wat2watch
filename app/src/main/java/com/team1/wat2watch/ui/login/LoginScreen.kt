@@ -1,5 +1,6 @@
 package com.team1.wat2watch.ui.login
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.Image
@@ -57,8 +58,11 @@ fun LoginScreen(
     val additionalOffset = if (showMessage) 40.dp else 0.dp
 
     LaunchedEffect(loginSuccess) {
+        Log.d("loginSuccess:", loginSuccess.toString())
         if (loginSuccess) {
-            navController.navigate("home")
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
         }
     }
 
@@ -312,12 +316,6 @@ fun PasswordInput(viewModel: LoginViewModel){
 
 @Composable
 fun SignInButton(viewModel: LoginViewModel, navController: NavController, modifier: Modifier = Modifier) {
-    val loginSuccess by viewModel.loginSuccess.observeAsState(false)
-    LaunchedEffect(loginSuccess) {
-        if (loginSuccess) {
-            navController.navigate("home")
-        }
-    }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {

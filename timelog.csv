@@ -46,9 +46,17 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-03-13,0,12,0,0,0,0,Connect to DB and update profile page
 2025-03-16,2,0,0,0,0,0,fix login and sign up flow and implement dynamic fetching from firebase for user profile
 2025-03-23,1,1,1,1,1,0,team meeting to divide up remaining tasks for final presentation
-2025-03-23,0,10,0,0,0,0,UI changes and firestore update
-2025-03-24,0,10,0,0,0,0,Worked on UI refinements and debugging
-2025-03-25,0,10,0,0,0,0,Integrated backend logic for matching
-2025-03-26,0,10,0,0,0,0,Tested and fixed minor UI bugs
-2025-03-27,0,10,0,0,0,0,Reviewed code, optimized performance
-2025-03-31,0,10,0,0,0,0,Code review and final testing Fixed merge conflicts and finalized feature
+2025-03-23,0,7,0,0,0,0,UI changes and Firestore update
+2025-03-23,0,0,0,1,0,0,Set up and start final report
+2025-03-23,4,0,0,0,0,0,Redesign the profile page and add an information modal on the match screen and clean up any hardcoded values across the app
+2025-03-24,0,7,0,0,0,0,Worked on UI refinements and debugging
+2025-03-24,0,0,0,0,2,0,Fix and finish watchlist page UI
+2025-03-24,0,0,4,0,0,0,Backend helper class functions
+2025-03-25,0,7,0,0,0,0,Integrated backend logic for matching
+2025-03-25,2,0,0,0,0,0,Report work: create a testing matrix to cover all edge cases
+2025-03-26,0,7,0,0,0,0,Tested and fixed minor UI bugs
+2025-03-26,0,0,0,1,0,0,Report work: changelist and requirements
+2025-03-26,0,0,0.5,0.5,0,0.5,In-class meeting to coordinate remaining tasks
+2025-03-27,0,7,0,0,0,0,Reviewed code, optimized performance
+2025-03-31,0,7,3,0,0,0,Code review and final testing. Fixed merge conflicts and finalized feature
+

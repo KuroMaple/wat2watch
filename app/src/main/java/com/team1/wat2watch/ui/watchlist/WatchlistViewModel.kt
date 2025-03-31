@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 import utils.Movie
 import wat2watch.utils.FirestoreHelper
 import wat2watch.utils.FirestoreHelper.getUserWatchlist
+import wat2watch.utils.FirestoreHelper.removeFromWatchList
 
 class WatchlistViewModel : ViewModel() {
 //    private val _movies = MutableStateFlow(
@@ -72,6 +73,11 @@ class WatchlistViewModel : ViewModel() {
 
     fun getMovieById(movieId: Int): Movie? {
         return _movies.value.find { it.id == movieId }
+    }
+
+    fun removeFromWatchlist(movieId: String) {
+        removeFromWatchList(movieId)
+        _movies.value = _movies.value.filter { it.id.toString() != movieId }
     }
 
 }

@@ -148,4 +148,10 @@ class LoginViewModel : ViewModel() {
     fun onCreateAccountClick() {
         _createAccountEvent.value = Unit
     }
+
+    fun resetLoginState() {
+        _loginSuccess.value = false
+        _loginError.value = null
+        _forgotPasswordSuccess.value = null
+    }
 }

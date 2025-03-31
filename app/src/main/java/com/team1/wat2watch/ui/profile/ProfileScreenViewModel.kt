@@ -1,15 +1,17 @@
 package com.team1.wat2watch.ui.profile
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.team1.wat2watch.ui.login.LoginViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 class ProfileScreenViewModel : ViewModel() {
-    private val _username = MutableLiveData<String>()
+    private val _username = MutableLiveData<String>("")
     val username: LiveData<String> = _username
 
     private val _email = MutableLiveData<String>()
@@ -18,8 +20,19 @@ class ProfileScreenViewModel : ViewModel() {
     private val _creationDate = MutableLiveData<String>()
     val creationDate: LiveData<String> = _creationDate
 
+    private val _isSignedOut = MutableLiveData<Boolean>(false)
+    val isSignedOut: LiveData<Boolean> = _isSignedOut
+
     private val auth = FirebaseAuth.getInstance()
     private val firestore = FirebaseFirestore.getInstance()
+
+    val _signOutEvent = MutableLiveData<Boolean>()
+    val signOutEvent: LiveData<Boolean> = _signOutEvent
+
+    private val _signOutSuccess = MutableLiveData<Boolean>()
+    val signOutSuccess: LiveData<Boolean> = _signOutSuccess
+
+    private val loginViewModel = LoginViewModel()
 
     init {
         loadUserData()
@@ -65,7 +78,19 @@ class ProfileScreenViewModel : ViewModel() {
     }
 
     fun signOut() {
-        auth.signOut()
+        try {
+            Log.d("ProfileScreenViewModel", "Signing out user")
+            auth.signOut()
+
+            // Log authentication state after sign out
+            Log.d("ProfileScreenViewModel", "After signOut, user is null: ${auth.currentUser == null}")
+
+            // Force the UI update
+            _signOutEvent.postValue(true)
+            _signOutSuccess.postValue(true)
+        } catch (e: Exception) {
+            Log.e("ProfileScreenViewModel", "Error signing out: ${e.message}")
+            _signOutSuccess.postValue(false)
+        }
     }
 }
-

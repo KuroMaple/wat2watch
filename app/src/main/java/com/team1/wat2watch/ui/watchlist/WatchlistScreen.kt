@@ -1,6 +1,10 @@
  package com.team1.wat2watch.ui.watchlist
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
@@ -40,6 +45,7 @@ import com.team1.wat2watch.ui.home.HomeViewModel
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.watchlist.WatchlistViewModel
 import com.team1.wat2watch.ui.navbar.NavBar
+import kotlinx.coroutines.launch
 import utils.Movie
 
  @Composable
@@ -143,63 +149,121 @@ fun WatchlistScreen(navController: NavController, modifier: Modifier = Modifier)
 
         LazyColumn {
             items(filteredMovies) { movie ->
-                MovieItem(movie = movie, navController = navController)
+                MovieItem(
+                    movie = movie,
+                    navController = navController,
+                    onRemove = { movieId -> viewModel.removeFromWatchlist(movieId) }
+                )
             }
         }
+
+
     }
 }
 
-@Composable
-fun MovieItem(movie: Movie, navController: NavController) {
-    var isBookmarked by remember { mutableStateOf(false) }
+ @Composable
+ fun MovieItem(
+     movie: Movie,
+     navController: NavController,
+     onRemove: (String) -> Unit
+ ) {
+     val offsetX = remember { Animatable(0f) }
+     val scope = rememberCoroutineScope()
+     val swipeThreshold = -80f
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable {
-                navController.navigate("movieDetails/${movie.id}")  // Navigate using movie ID
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        AsyncImage(
-            model = movie.getFullImageUrl(),
-            contentDescription = movie.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(100.dp)
-                .clip(RoundedCornerShape(8.dp))
-        )
+     Box(
+         modifier = Modifier
+             .fillMaxWidth()
+             .height(100.dp)
+             .background(Color.White)
+     ) {
+         Box(
+             modifier = Modifier
+                 .fillMaxSize()
+                 .background(Color.Red),
+             contentAlignment = Alignment.CenterEnd
+         ) {
+             Text(
+                 text = "Delete",
+                 color = Color.White,
+                 fontWeight = FontWeight.Bold,
+                 fontSize = 18.sp,
+                 modifier = Modifier
+                     .clickable {
+                         onRemove(movie.id.toString())
+                         scope.launch {
+                             offsetX.snapTo(0f)
+                         }
+                     }
+                     .padding(horizontal = 16.dp)
+             )
+         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+         Box(
+             modifier = Modifier
+                 .fillMaxSize()
+                 .offset(x = offsetX.value.dp)
+                 .draggable(
+                     state = rememberDraggableState { delta ->
+                         scope.launch {
+                             val newValue = (offsetX.value + delta).coerceAtMost(0f) // Only swipe left
+                             if (newValue >= swipeThreshold) {
+                                 offsetX.snapTo(newValue)
+                             }
+                         }
+                     },
+                     orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
+                     onDragStopped = {
+                         if (offsetX.value < -60f) {
+                             scope.launch {
+                                 offsetX.animateTo(-100f, tween(200))
+                             }
+                         } else {
+                             scope.launch { offsetX.animateTo(0f, tween(300)) }
+                         }
+                     }
+                 )
+                 .background(Color.White)
+                 .padding(vertical = 8.dp)
+         ) {
+             Row(
+                 modifier = Modifier
+                     .fillMaxWidth()
+                     .padding(vertical = 8.dp),
+                 verticalAlignment = Alignment.CenterVertically
+             ) {
+                 AsyncImage(
+                     model = movie.getFullImageUrl(),
+                     contentDescription = movie.title,
+                     contentScale = ContentScale.Crop,
+                     modifier = Modifier
+                         .size(100.dp)
+                         .clip(RoundedCornerShape(8.dp))
+                 )
 
-        Column {
-            Text(
-                text = movie.title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                color = Color.Black
-            )
-            Text(
-                text = "${movie.release_date} • ${movie.adult}",
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-        }
+                 Spacer(modifier = Modifier.width(16.dp))
 
-        Spacer(modifier = Modifier.weight(1f))
+                 Column {
+                     Text(
+                         text = movie.title,
+                         fontWeight = FontWeight.Bold,
+                         fontSize = 20.sp,
+                         color = Color.Black
+                     )
+                     Text(
+                         text = "${movie.release_date} • ${if (movie.adult) "18+" else "Rated PG"}",
+                         fontSize = 16.sp,
+                         color = Color.Gray
+                     )
+                 }
 
-        IconButton(
-            onClick = { isBookmarked = !isBookmarked }
-        ) {
-            Icon(
-                imageVector = if (isBookmarked) Icons.Filled.Favorite else Icons.Outlined.Favorite,
-                contentDescription = "Bookmark Icon",
-                tint = if (isBookmarked) Color.Red else Color.Gray
-            )
-        }
-    }
-}
+                 Spacer(modifier = Modifier.weight(1f))
+             }
+         }
+     }
+ }
+
+
 
 
 @Preview(showBackground = true)

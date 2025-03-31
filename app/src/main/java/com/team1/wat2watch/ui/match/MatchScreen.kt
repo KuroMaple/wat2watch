@@ -50,6 +50,7 @@ import wat2watch.utils.FirestoreHelper
 fun MatchScreen(navController: NavController,
                 viewModel: MatchViewModel) {
     val movies = viewModel.movies.collectAsState().value
+    val showInfoModal = viewModel.showInfoModal.collectAsState().value
     val isSolo by viewModel.isSolo.collectAsState()  // Track solo/group state
     val participants by viewModel.participants.collectAsState()
 
@@ -60,7 +61,7 @@ fun MatchScreen(navController: NavController,
         )
     }
 
-    Scaffold (
+    Scaffold(
         topBar = {
             Column {
                 TopNavigationBar(navController = navController, viewModel = viewModel)
@@ -85,7 +86,10 @@ fun MatchScreen(navController: NavController,
             }
         },
         bottomBar = {
-            BottomNavigationBar(onUndoClick = {viewModel.triggerUndo()})
+            BottomNavigationBar(
+                onUndoClick = { viewModel.triggerUndo() },
+                onInfoClick = { viewModel.showInfoModal() }
+            )
         }
     ){ paddingValues ->
         Box(
@@ -99,6 +103,11 @@ fun MatchScreen(navController: NavController,
                 matchViewModel = viewModel,
                 navController
             )
+
+            // Show the info modal when needed
+            if (showInfoModal) {
+                InfoModal(onDismiss = { viewModel.hideInfoModal() })
+            }
         }
     }
 }
@@ -147,7 +156,8 @@ fun TopNavigationBar(modifier: Modifier = Modifier, navController: NavController
 
 @Composable
 fun BottomNavigationBar(
-    onUndoClick: () -> Unit
+    onUndoClick: () -> Unit,
+    onInfoClick: () -> Unit
 ) {
     Row (
         modifier = Modifier
@@ -194,8 +204,8 @@ fun BottomNavigationBar(
                 .align(Alignment.CenterVertically)
                 .width(204.dp)
                 .height(40.dp)
-        )
-        {
+                .clickable(onClick = onInfoClick)
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.info_icon),
                 contentDescription = "info icon",
@@ -241,5 +251,3 @@ fun MatchScreenPreview() {
     val fakeNavController = remember { NavController(context) }
     MatchScreen(fakeNavController, MatchViewModel())
 }
-
-

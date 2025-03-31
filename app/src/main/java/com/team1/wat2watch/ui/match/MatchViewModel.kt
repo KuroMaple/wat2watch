@@ -57,11 +57,24 @@ class MatchViewModel: ViewModel() {
 
     private val _undoSwipe = MutableStateFlow(false)
     val undoSwipe: StateFlow<Boolean> = _undoSwipe
+
+    private val _showInfoModal = MutableStateFlow(false)
+    val showInfoModal: StateFlow<Boolean> = _showInfoModal
+
     fun triggerUndo() {
         _undoSwipe.value = true
     }
+
     fun resetTriggerUndo() {
         _undoSwipe.value = false
+    }
+
+    fun showInfoModal() {
+        _showInfoModal.value = true
+    }
+
+    fun hideInfoModal() {
+        _showInfoModal.value = false
     }
 
     suspend fun fetchMovies(

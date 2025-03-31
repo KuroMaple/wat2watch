@@ -510,4 +510,11 @@ object FirestoreHelper {
         )
     }
 
+    suspend fun getUserUsernameAsync(): String = suspendCoroutine { cont ->
+        getUserUsername(
+            onSuccess = { username -> cont.resume(username) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
 }

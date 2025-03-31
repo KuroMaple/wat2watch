@@ -9,11 +9,24 @@ import androidx.navigation.NavController
 import com.team1.wat2watch.ui.match.MatchViewModel
 import kotlinx.coroutines.launch
 import wat2watch.utils.FirestoreHelper
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeViewModel: ViewModel() {
     // Input area for session code
     private val _code = MutableLiveData<String>()
     val code: LiveData<String> = _code
+
+    private val _username = MutableLiveData<String>()
+    val username: LiveData<String> = _username
+    fun setUsername(userName: String){
+        _username.value = userName
+    }
+
+    init {
+        fetchUsername()
+    }
+
     fun setCode(newCode: String) {
         _code.value = newCode
     }
@@ -91,4 +104,16 @@ class HomeViewModel: ViewModel() {
 
     }
 
+
+    private fun fetchUsername() {
+        viewModelScope.launch {
+            try {
+                val currUser = FirestoreHelper.getUserUsernameAsync()
+                this@HomeViewModel.setUsername(currUser)
+            }
+            catch (e: Exception) {
+                Log.e("HomeViewModel", "Error Fetching Username: ${e.message}")
+            }
+        }
+    }
 }
