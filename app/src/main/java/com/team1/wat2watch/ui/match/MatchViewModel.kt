@@ -116,14 +116,25 @@ class MatchViewModel: ViewModel() {
                 }
 
                 FirestoreHelper.endSessionAsync(sessionId)
-                navController.navigate("home")
+
                 val sessionInfo = FirestoreHelper.getSessionInfoAsync(sessionId)
                 if (sessionInfo.isActive) {
                     throw Exception("Session did not end")
                 }
+                if (sessionInfo.selectedMovie != null){
+                    FirestoreHelper.addMatchHistory(
+                        sessionId = sessionInfo.sessionId,
+                        movie = sessionInfo.selectedMovie,
+                        users = sessionInfo.users
+                    )
+                }
+                else {
+                    Log.d("MatchViewModel", "No selected movie to add to match history")
+                }
+
 
                 Log.d("MatchViewModel", "${sessionInfo.sessionAlias} session ended successfully")
-
+                navController.navigate("history")
             }
             catch (e: Exception) {
                 Log.e("MatchViewModel", "Error ending session: ${e.message}")

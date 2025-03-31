@@ -209,7 +209,8 @@ object FirestoreHelper {
      * Gets all matches from user's match history
      */
 
-    fun getUserMatchHistory(userId: String, onSuccess: (List<MatchHistoryItem>) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getUserMatchHistory(onSuccess: (List<MatchHistoryItem>) -> Unit, onFailure: (Exception) -> Unit) {
+        val userId = getCurrentUserUid() ?: return
         val matchHistoryRef = db.collection("users").document(userId).collection("matchHistory")
 
         matchHistoryRef.get()
@@ -397,8 +398,22 @@ object FirestoreHelper {
                 val countGoal = document.get("countGoal") as? Int ?: 1
                 val swipes = document.get("swipes") as? Map<String, Map<String, Any>> ?: emptyMap()
                 val sessionAlias = document.getString("sessionAlias") ?: ""
+                val selectedMovieMap = document.get("selectedMovie") as? Map<String, Any>
+                val selectedMovie = selectedMovieMap?.let {
+                    Movie(
+                        id = it["id"] as? Int ?: 0,
+                        title = it["title"] as? String ?: "",
+                        release_date = it["release_date"] as? String ?: "",
+                        poster_path = it["poster_path"] as? String ?: "",
+                        overview = it["overview"] as? String ?: "",
+                        adult = it["adult"] as? Boolean ?: false,
+                        addedOn = it["addedOn"]?.toString() ?: ""
+                    )
+                }
+
+
                 // Return session object
-                val session = Session(isActive, userNames, swipes, countGoal, curSession, sessionAlias)
+                val session = Session(isActive, userNames, swipes, countGoal, curSession, sessionAlias, selectedMovie)
                 onSuccess(session)
             } else {
                 onFailure(Exception("Session not found"))

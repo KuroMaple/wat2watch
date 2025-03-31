@@ -9,7 +9,8 @@ data class Session(
     val swipes: Map<String, Map<String, Any>>,
     val countGoal: Int,
     val sessionId: String,
-    val sessionAlias: String
+    val sessionAlias: String,
+    val selectedMovie: Movie?
 )
 
 private val animalList = listOf(

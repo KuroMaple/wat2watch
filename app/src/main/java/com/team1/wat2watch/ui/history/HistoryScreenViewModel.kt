@@ -1,42 +1,20 @@
 package com.team1.wat2watch.ui.history
 
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import com.google.firebase.firestore.FirebaseFirestore
-import com.team1.wat2watch.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import utils.Movie
-import wat2watch.utils.FirestoreHelper
 import wat2watch.utils.FirestoreHelper.getUserMatchHistory
-import wat2watch.utils.FirestoreHelper.getUserWatchlist
-import wat2watch.utils.FirestoreHelper.removeFromWatchList
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 // Data class to structure history items for UI
 data class HistoryItemData(
     val names: String,
-    val movie: String,
+    val movie: Movie,
     val timestamp: String,
-    val imageUrl: String
 )
 
 class HistoryScreenViewModel : ViewModel() {
@@ -44,17 +22,15 @@ class HistoryScreenViewModel : ViewModel() {
     private val _historyItems = MutableStateFlow<List<HistoryItemData>>(emptyList())
     val historyItems: StateFlow<List<HistoryItemData>> = _historyItems
 
-    fun fetchUserMatchHistory(userId: String) {
+    fun fetchUserMatchHistory() {
         getUserMatchHistory(
-            userId,
             onSuccess = { matchHistoryList ->
                 val mappedHistory = matchHistoryList.mapNotNull { match ->
                     match.selectedMovie.poster_path?.let {
                         HistoryItemData(
                             names = match.users.joinToString(", "),
-                            movie = match.selectedMovie.title,
-                            timestamp = match.selectedMovie.addedOn,
-                            imageUrl = it
+                            movie = match.selectedMovie,
+                            timestamp = formatTimestamp(match.selectedMovie.addedOn.toLong()),
                         )
                     }
                 }
@@ -70,26 +46,46 @@ class HistoryScreenViewModel : ViewModel() {
         )
     }
 
+    fun formatTimestamp(timestamp: Long): String {
+        val instant = Instant.ofEpochMilli(timestamp)
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            .withZone(ZoneId.systemDefault())
+        return formatter.format(instant)
+    }
+
     private fun getDummyData(): List<HistoryItemData> {
         return listOf(
             HistoryItemData(
-                names = "Alice, Bob, Charlie",
-                movie = "Inception",
-                timestamp = "2025-03-28",
-                imageUrl = "/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg"
+                names = "testuser, hassan@gmail.com",
+                movie =  Movie(
+                    title = "Sonic the Hedgehog 3",
+                    release_date = "2024-12-19",
+                    poster_path = "/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg",
+                    overview = "Sonic, Knuckles, and Tails reunite against a powerful new " +
+                            "adversary, Shadow, a mysterious villain with powers unlike anything " +
+                            "they have faced before. With their abilities outmatched in every way, " +
+                            "Team Sonic must seek out an unlikely alliance in hopes of stopping " +
+                            "Shadow and protecting the planet.",
+                    adult = false,
+                    addedOn = formatTimestamp("1743571200000".toLong()),
+                    id = 0
+                ),
+                timestamp = formatTimestamp("1743571200000".toLong()),
             ),
-            HistoryItemData(
-                names = "Dave, Eve, Frank",
-                movie = "Interstellar",
-                timestamp = "2025-03-27",
-                imageUrl = "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
-            ),
-            HistoryItemData(
-                names = "Grace, Hank, Ivy",
-                movie = "The Dark Knight",
-                timestamp = "2025-03-26",
-                imageUrl = "/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
-            )
+//            HistoryItemData(
+//                names = "Dave, Eve, Frank",
+//                movie = "Interstellar",
+//                timestamp = "2025-03-27",
+//                imageUrl = "/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
+//            ),
+//            HistoryItemData(
+//                names = "Grace, Hank, Ivy",
+//                movie = "The Dark Knight",
+//                timestamp = "2025-03-26",
+//                imageUrl = "/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+//            )
         )
     }
+
+
 }

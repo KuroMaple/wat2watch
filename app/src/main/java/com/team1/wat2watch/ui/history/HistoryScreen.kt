@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,6 +27,7 @@ import coil.compose.AsyncImage
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.navbar.NavBar
+import utils.Movie
 
 @Composable
 fun HistoryScreen(navController: NavController, modifier: Modifier = Modifier) {
@@ -33,7 +35,7 @@ fun HistoryScreen(navController: NavController, modifier: Modifier = Modifier) {
     val historyItems by viewModel.historyItems.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.fetchUserMatchHistory("userId")
+        viewModel.fetchUserMatchHistory()
     }
 
     Column(
@@ -53,7 +55,6 @@ fun HistoryScreen(navController: NavController, modifier: Modifier = Modifier) {
                     names = history.names,
                     movie = history.movie,
                     timestamp = history.timestamp,
-                    imageUrl = history.imageUrl
                 )
             }
         }
@@ -63,7 +64,8 @@ fun HistoryScreen(navController: NavController, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HistoryItem(names: String, movie: String, timestamp: String, imageUrl: String) {
+fun HistoryItem(names: String, movie: Movie, timestamp: String) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,10 +73,8 @@ fun HistoryItem(names: String, movie: String, timestamp: String, imageUrl: Strin
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = imageUrl,
-            contentDescription = movie,
-            placeholder = painterResource(R.drawable.image18),
-            error = painterResource(R.drawable.image17),
+            model = movie.getFullImageUrl(),
+            contentDescription = movie.title,
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -89,7 +89,7 @@ fun HistoryItem(names: String, movie: String, timestamp: String, imageUrl: Strin
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
-                text = movie,
+                text = movie.title,
                 color = Color.Black,
                 style = MaterialTheme.typography.titleLarge
             )
