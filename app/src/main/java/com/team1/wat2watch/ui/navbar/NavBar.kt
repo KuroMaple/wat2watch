@@ -42,7 +42,6 @@ fun NavBar(viewModel: NavBarViewModel) {
         listOf(
             R.drawable.wat2watch_navbar_home_svg to "Home Icon",
             R.drawable.wat2watch_navbar_search_icon to "Search Icon",
-            R.drawable.wat2watch_navbar_add_icon to "Add Icon",
             R.drawable.wat2watch_navbar_history_icon to "History Icon",
             R.drawable.wat2watch_navbar_user_icon to "Profile Icon"
         ).forEach { (item, description) ->

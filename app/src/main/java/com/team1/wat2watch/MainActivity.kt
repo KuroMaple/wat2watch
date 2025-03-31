@@ -12,9 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,7 +27,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.team1.wat2watch.ui.history.HistoryScreen
 import com.team1.wat2watch.ui.home.HomeScreen
 import com.team1.wat2watch.ui.login.LoginViewModel
@@ -158,7 +155,7 @@ fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit, startDestinat
                     composable("history") { HistoryScreen(navController = navController) }
                     composable("signup") { SignUpScreen(navController = navController) }
                     composable("profile") { ProfileScreen(navController = navController) }
-                    composable("match") { MatchScreen(navController) }
+                    composable("match") { MatchScreen(navController, matchViewModel) }
                     composable("search") { WatchlistScreen(navController = navController) }
                     composable("movieDetails/{movieId}") { backStackEntry ->
                         val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
