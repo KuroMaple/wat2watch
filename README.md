@@ -109,6 +109,42 @@ A few things to note are the `default_web_client_id` -> this should not cause an
 
 Here is a detailed guide: https://developer.android.com/identity/sign-in/credential-manager-siwg#set-google
 
+## API Usage Instructions
+
+### Step 1: Add to `local.properties`
+Copy the following into your local.properties file:
+```bash
+API_KEY = ec4dc5f4fcfb4d7318b2a172b95704fd
+BASE_URL = https://api.themoviedb.org/3/
+IMAGE_BASE_URL = https://image.tmdb.org/t/p/w500
+```
+
+### Step 2: Verify `build.gradle.kts (:app)`
+Ensure your build.gradle.kts (:app) file includes the following (it should be there if you pull from main, but just in case):
+```bash
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties().apply {
+    load(FileInputStream(localPropertiesFile))
+}
+val apiKey = localProperties.getProperty("API_KEY") ?: ""
+val baseUrl = localProperties.getProperty("BASE_URL") ?: ""
+val imageBaseUrl = localProperties.getProperty("IMAGE_BASE_URL") ?: ""
+
+android {
+    ...
+    defaultConfig {
+        ...
+        minSdk = 26  // Change to this version
+        targetSdk = 35  // Change to this version
+        ...
+        // Copy all of these
+        buildConfigField("String", "API_KEY", "\"$apiKey\"") 
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        buildConfigField("String", "IMAGE_BASE_URL", "\"$imageBaseUrl\"")
+    }
+}
+```
+
 ## To Run The Application
 
 Click the play icon in the top bar or go to Run > Run app
