@@ -54,5 +54,5 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-03-26,0,0,0,1,0,0,report work: changelist and requirements
 2025-03-26,0,0,0.5,0.5,0,0.5,in-class meeting to coordinate remaining tasks
 2025-03-28,0,0,0,0,3,0,integrate past matches with backend
-
-
+2025-03-30,1,0,0,0,0,0,report work: match functional requirements to specific functions in the codebase
+2025-03-31,1,0,0,0,0,0,test branch locally to validate and run manual E2E tests according to testing matrix
