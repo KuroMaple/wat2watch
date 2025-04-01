@@ -5,20 +5,20 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlin.math.ceil
 import com.google.firebase.firestore.FieldValue
+import kotlinx.coroutines.tasks.await
 import utils.Movie
+import utils.Session
+import utils.generateSessionIdAlias
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 object FirestoreHelper {
-
-
-    data class UserInfo(
-        val uid: String = "",
-        val username: String = ""
-    )
 
     data class MatchHistoryItem(
         val sessionId: String = "",
         val selectedMovie: Movie = Movie(),
-        val users: List<UserInfo> = emptyList()
+        val users: List<String> = emptyList()
     )
 
     private val db = FirebaseFirestore.getInstance()
@@ -72,11 +72,14 @@ object FirestoreHelper {
      *         )
      */
     fun getUserUsername(onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        Log.d("FirestoreHelper", "Fetching user's username before")
         val uid = getCurrentUserUid() ?: return
+        Log.d("FirestoreHelper", "Fetching user's username after")
         db.collection("users").document(uid)
             .get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
+                    Log.d("FirestoreHelper", "Fetched user's username in if statement")
                     val username = document.getString("username") ?: ""
                     Log.d("FirestoreHelper", "Fetched user's username: $username")
                     onSuccess(username)
@@ -173,7 +176,7 @@ object FirestoreHelper {
      * Adds an ended session to the user's match history (should be called from session end)
      */
 
-    fun addMatchHistory(sessionId: String, movie: Movie, users: List<UserInfo>) {
+    fun addMatchHistory(sessionId: String, movie: Movie, users: List<String>) {
         val uid = getCurrentUserUid() ?: return
         val matchHistoryRef = db.collection("users").document(uid).collection("matchHistory")
 
@@ -189,12 +192,7 @@ object FirestoreHelper {
                 "adult" to movie.adult,
                 "addedOn" to System.currentTimeMillis()
             ),
-            "users" to users.map { user ->
-                hashMapOf(
-                    "uid" to user.uid,
-                    "username" to user.username
-                )
-            }
+            "users" to users
         )
 
         matchHistoryRef.document(sessionId).set(matchData)
@@ -211,7 +209,8 @@ object FirestoreHelper {
      * Gets all matches from user's match history
      */
 
-    fun getUserMatchHistory(userId: String, onSuccess: (List<MatchHistoryItem>) -> Unit, onFailure: (Exception) -> Unit) {
+    fun getUserMatchHistory(onSuccess: (List<MatchHistoryItem>) -> Unit, onFailure: (Exception) -> Unit) {
+        val userId = getCurrentUserUid() ?: return
         val matchHistoryRef = db.collection("users").document(userId).collection("matchHistory")
 
         matchHistoryRef.get()
@@ -225,20 +224,14 @@ object FirestoreHelper {
                         id = movieData["id"] as? Int ?: 0,
                         title = movieData["title"] as? String ?: "",
                         release_date = movieData["release_date"] as? String ?: "",
-//                        runtime = movieData["runtime"] as? String ?: "",
                         poster_path = movieData["poster_path"] as? String ?: "",
                         overview = movieData["overview"] as? String ?: "",
                         adult = movieData["adult"] as? Boolean ?: false,
                         addedOn = movieData["addedOn"]?.toString() ?: ""
                     )
 
-                    val usersData = document.get("users") as? List<Map<String, Any>> ?: emptyList()
-                    val users = usersData.map { userMap ->
-                        UserInfo(
-                            uid = userMap["uid"] as? String ?: "",
-                            username = userMap["username"] as? String ?: ""
-                        )
-                    }
+                    val users = document.get("users") as? List<String> ?: emptyList()
+
 
                     val matchHistoryItem = MatchHistoryItem(sessionId, movie, users)
                     matchHistoryList.add(matchHistoryItem)
@@ -257,15 +250,17 @@ object FirestoreHelper {
      * Session Functions
      */
 
-    fun createSession(onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+    private fun createSession(onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         // Creating a random ID using firestore
         val sessionId = FirebaseFirestore.getInstance().collection("sessions").document().id
+        val sessionAlias = generateSessionIdAlias(sessionId)
         val sessionData = hashMapOf(
             "sessionId" to sessionId,
             "users" to emptyList<String>(),
             "swipes" to hashMapOf<String, Map<String, Any>>(), // Dictionary containing key: movie ID and val: Movie and swipeCount
             "countGoal" to 1, // Default count goal for a single user
-            "active" to true
+            "active" to true,
+            "sessionAlias" to sessionAlias
         )
 
         FirebaseFirestore.getInstance().collection("sessions").document(sessionId)
@@ -280,7 +275,8 @@ object FirestoreHelper {
             }
     }
 
-    fun joinSession(sessionId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+
+    private fun joinSessionById(sessionId: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         val firestore = FirebaseFirestore.getInstance()
         val sessionRef = firestore.collection("sessions").document(sessionId)
         val uid = getCurrentUserUid() ?: return
@@ -293,15 +289,26 @@ object FirestoreHelper {
                 sessionRef.get().addOnSuccessListener { document ->
                     if (document.exists()) {
                         val users = document.get("users") as? List<String> ?: emptyList()
+                        if (users.contains(username)) {
+                            // Prevent duplicate adds
+                            Log.d("FirestoreHelper", "User $username already in session $sessionId")
+                            onSuccess(username)
+
+                        }
                         val newCountGoal = ceil((users.size + 1) / 2.0).toInt()  // Majority
+                        Log.d("FirestoreHelper", "New count goal: $newCountGoal")
+                        if (users.size >= 8) {
+                            onFailure(Exception("Session is full"))
+                        }
 
                         sessionRef.update(
                             "users", FieldValue.arrayUnion(username), // Store username instead of UID
                             "countGoal", newCountGoal
                         )
                             .addOnSuccessListener {
+
                                 Log.d("FirestoreHelper", "User $username joined session $sessionId")
-                                onSuccess()
+                                onSuccess(username)
                             }
                             .addOnFailureListener { e ->
                                 Log.e("FirestoreHelper", "Error joining session: ${e.message}")
@@ -320,7 +327,7 @@ object FirestoreHelper {
             }
     }
 
-    fun logSwipe(sessionId: String, movie: Movie, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    private fun logSwipe(sessionId: String, movie: Movie, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         val sessionRef = FirebaseFirestore.getInstance().collection("sessions").document(sessionId)
 
         sessionRef.get().addOnSuccessListener { document ->
@@ -352,7 +359,7 @@ object FirestoreHelper {
                         Log.d("FirestoreHelper", "Swipe logged for movie $movieId in session $sessionId")
 
                         // Check if the session should end based on the countGoal
-                        if (newCount >= countGoal) {
+                        if (newCount > countGoal) {
                             val updates = hashMapOf<String, Any>(
                                 "active" to false,  // Mark session as inactive
                                 "selectedMovie" to movieData // Store full movie details
@@ -378,8 +385,9 @@ object FirestoreHelper {
         }
     }
 
+
     // returns sessionId, user names (in string, just display them as is), and isActive signal
-    fun getSessionInfo(sessionId: String, onSuccess: (String, String, Boolean) -> Unit, onFailure: (Exception) -> Unit) {
+    private fun getSessionInfo(sessionId: String, onSuccess: (Session) -> Unit, onFailure: (Exception) -> Unit) {
         val sessionRef = FirebaseFirestore.getInstance().collection("sessions").document(sessionId)
 
         sessionRef.get().addOnSuccessListener { document ->
@@ -387,11 +395,26 @@ object FirestoreHelper {
                 val curSession = document.getString("sessionId") ?: ""
                 val userNames = document.get("users") as? List<String> ?: emptyList()
                 val isActive = document.getBoolean("active") ?: false
+                val countGoal = document.get("countGoal") as? Int ?: 1
+                val swipes = document.get("swipes") as? Map<String, Map<String, Any>> ?: emptyMap()
+                val sessionAlias = document.getString("sessionAlias") ?: ""
+                val selectedMovieMap = document.get("selectedMovie") as? Map<String, Any>
+                val selectedMovie = selectedMovieMap?.let {
+                    Movie(
+                        id = it["id"] as? Int ?: 0,
+                        title = it["title"] as? String ?: "",
+                        release_date = it["release_date"] as? String ?: "",
+                        poster_path = it["poster_path"] as? String ?: "",
+                        overview = it["overview"] as? String ?: "",
+                        adult = it["adult"] as? Boolean ?: false,
+                        addedOn = it["addedOn"]?.toString() ?: ""
+                    )
+                }
 
-                // Join usernames
-                val userNamesString = userNames.joinToString(", ")
-                // Return values
-                onSuccess(curSession, userNamesString, isActive)
+
+                // Return session object
+                val session = Session(isActive, userNames, swipes, countGoal, curSession, sessionAlias, selectedMovie)
+                onSuccess(session)
             } else {
                 onFailure(Exception("Session not found"))
             }
@@ -399,4 +422,99 @@ object FirestoreHelper {
             onFailure(e)
         }
     }
+
+    private fun endSession(sessionId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val sessionRef = FirebaseFirestore.getInstance().collection("sessions").document(sessionId)
+        sessionRef.update("active", false).addOnSuccessListener {
+            Log.d("FirestoreHelper", "Session $sessionId ended")
+            onSuccess()
+        }.addOnFailureListener(onFailure)
+
+    }
+
+    private fun getSessionIdFromAlias(
+        sessionAlias: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val firestore = FirebaseFirestore.getInstance()
+
+        firestore.collection("sessions")
+            .whereEqualTo("sessionAlias", sessionAlias) // Query for alias field
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (querySnapshot.isEmpty) {
+                    onFailure(Exception("Session not found"))
+                    return@addOnSuccessListener
+                }
+
+                // Get the first matching document ID (which is the session ID)
+                val sessionId = querySnapshot.documents.first().id
+                onSuccess(sessionId)
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
+
+
+    /*
+    * ONLY THE BELOW FUNCTIONS SHOULD BE USED OUTSIDE OF HELPER
+    * Encapsulating functions in suspend wrappers for better performance and readability
+    * */
+    suspend fun createSessionAsync(): String = suspendCoroutine { cont ->
+        createSession(
+            onSuccess = { cont.resume(it) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
+    suspend fun getSessionIdFromAliasAsync(sessionAlias: String): String = suspendCoroutine { cont ->
+        getSessionIdFromAlias(
+            sessionAlias,
+            onSuccess = { cont.resume(it) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
+    suspend fun joinSessionWithIdAsync(sessionId: String): String = suspendCoroutine { cont ->
+        joinSessionById(
+            sessionId,
+            onSuccess = { username -> cont.resume(username) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
+    suspend fun getSessionInfoAsync(sessionId: String): Session = suspendCoroutine { cont ->
+        getSessionInfo(
+            sessionId,
+            onSuccess = { session -> cont.resume(session) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
+    suspend fun endSessionAsync(sessionId: String): Unit = suspendCoroutine { cont ->
+        endSession(
+            sessionId,
+            onSuccess = { cont.resume(Unit) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
+    suspend fun logSwipeAsync(sessionId: String, movie: Movie): String = suspendCoroutine { cont ->
+        logSwipe(
+            sessionId,
+            movie,
+            onSuccess = { cont.resume(sessionId) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
+    suspend fun getUserUsernameAsync(): String = suspendCoroutine { cont ->
+        getUserUsername(
+            onSuccess = { username -> cont.resume(username) },
+            onFailure = { cont.resumeWithException(it) }
+        )
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.team1.wat2watch.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,7 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.team1.wat2watch.R
-
+import com.team1.wat2watch.ui.match.MatchViewModel
+import wat2watch.utils.FirestoreHelper
 
 
 val nunitoSansFont = FontFamily(
@@ -46,7 +48,8 @@ val rainyHeartsFont = FontFamily(
 
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    matchViewModel: MatchViewModel
 ) {
     val viewModel = HomeViewModel()
     val username by viewModel.username.observeAsState("User")
@@ -130,7 +133,7 @@ fun HomeScreen(
                         .requiredWidth(width = 246.dp))
                 Spacer(modifier = Modifier.height(15.dp))
                 CodeInput(viewModel)
-                JoinPartyButton()
+                JoinPartyButton(matchViewModel, viewModel, navController)
                 Spacer(modifier = Modifier.height(45.dp))
                 Text(
                     text = "OR",
@@ -140,16 +143,25 @@ fun HomeScreen(
                         fontFamily = nunitoSansFont
                     ))
                 Spacer(modifier = Modifier.height(40.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.wat2watch_home_add_party_icon),
-                    contentDescription = "Join Party Icon",
-                    modifier = Modifier
-                        .requiredWidth(103.dp)
-                        .requiredHeight(103.dp),
-                    tint = Color(0xFFC9DBEF)
-                )
-                Spacer(modifier = Modifier.height(30.dp))
-                StartPartyButton(navController)
+                CreatePartyButton(homeViewModel = viewModel, navController, matchViewModel)
+//                Icon(
+//                    painter = painterResource(id = R.drawable.wat2watch_home_add_party_icon),
+//                    contentDescription = "Join Party Icon",
+//                    modifier = Modifier
+//                        .requiredWidth(103.dp)
+//                        .requiredHeight(103.dp),
+//                    tint = Color(0xFFC9DBEF)
+//                )
+                Spacer(modifier = Modifier.height(45.dp))
+                Text(
+                    text = "OR",
+                    color = Color.Black,
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontFamily = nunitoSansFont
+                    ))
+                Spacer(modifier = Modifier.height(40.dp))
+                SoloSwipeButton(navController, matchViewModel)
             }
 
 
@@ -162,31 +174,54 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     val context = LocalContext.current
     val fakeNavController = remember { NavController(context) }
-    HomeScreen(fakeNavController)
+    HomeScreen(fakeNavController, MatchViewModel())
 }
 
 @Composable
 fun CodeInput(viewModel: HomeViewModel){
     val code by viewModel.code.observeAsState("") // Default to empty string
-    BasicTextField(
-        value = code,
-        onValueChange = { viewModel.setCode(it) },
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            color = Color.Black,
-            fontFamily = com.team1.wat2watch.ui.login.nunitoSansFont,
-        ),
-        modifier = Modifier
-            .background(Color(0xfff5f5f5), RoundedCornerShape(8.dp))
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            .requiredWidth(260.dp)
-            .requiredHeight(36.dp)
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-    )
+    val errorMessage by viewModel.errorMessage.observeAsState(null)
+
+    Column {
+        BasicTextField(
+            value = code,
+            onValueChange = { viewModel.setCode(it) },
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                color = Color.Black,
+                fontFamily = com.team1.wat2watch.ui.login.nunitoSansFont,
+            ),
+            modifier = Modifier
+                .background(Color(0xfff5f5f5), RoundedCornerShape(8.dp))
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .requiredWidth(260.dp)
+                .requiredHeight(36.dp)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+
+        // Display error message if present
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = Color.Red,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = nunitoSansFont
+                ),
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
 }
 
 @Composable
-fun JoinPartyButton(/*Add Params here when behaviour defined*/){
+fun JoinPartyButton(
+    matchViewModel: MatchViewModel,
+    homeViewModel: HomeViewModel,
+    navController: NavController
+){
+    val sessionIdInput = homeViewModel.code.observeAsState().value ?: ""
+
     InputChip(
         label = {
             Text(
@@ -206,16 +241,21 @@ fun JoinPartyButton(/*Add Params here when behaviour defined*/){
             disabledContainerColor = Color(0xFFC9DBEF)
         ),
         selected = true,
-        onClick = {},
+        onClick = {
+            homeViewModel.onJoinPartyClick(
+                navController,
+                matchViewModel
+            )
+        },
     )
 }
 
 @Composable
-fun StartPartyButton(navController: NavController){
+fun CreatePartyButton(homeViewModel: HomeViewModel, navController: NavController, matchViewModel: MatchViewModel){
     InputChip(
         label = {
             Text(
-                text = "Start a party",
+                text = "Create a party",
                 color = Color.Black,
                 textAlign = TextAlign.Center,
                 style = TextStyle(
@@ -232,6 +272,43 @@ fun StartPartyButton(navController: NavController){
         ),
         selected = true,
         onClick = {
+            homeViewModel.onCreatePartyClick(navController, matchViewModel)
+        },
+    )
+}
+
+@Composable
+fun SoloSwipeButton(navController: NavController, matchViewModel: MatchViewModel){
+    InputChip(
+        label = {
+            Text(
+                text = "Solo Swipe Session",
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontFamily = nunitoSansFont
+                )
+            )
+        },
+        shape = RoundedCornerShape(8.dp),
+        colors = InputChipDefaults.inputChipColors(
+            containerColor = Color(0xFFC9DBEF),
+            selectedContainerColor = Color(0xFFC9DBEF),
+            disabledContainerColor = Color(0xFFC9DBEF)
+        ),
+        selected = true,
+        onClick = {
+            // Fetch the username from Firestore and set it as the participant
+            FirestoreHelper.getUserUsername(
+                onSuccess = { username ->
+                    matchViewModel.addParticipant(username)
+                },
+                onFailure = { exception ->
+                    Log.e("SignUpViewModel", "Failed to get username: ${exception.message}")
+                }
+            )
+            matchViewModel.setSolo(true)
             navController.navigate("match")
         },
     )

@@ -3,12 +3,19 @@ package com.team1.wat2watch.ui.history
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -16,14 +23,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.login.LoginViewModel
 import com.team1.wat2watch.ui.navbar.NavBar
+import utils.Movie
 
 @Composable
-fun HistoryScreen(
-    modifier: Modifier = Modifier,
-) {
+fun HistoryScreen(navController: NavController, modifier: Modifier = Modifier) {
+    val viewModel = remember { HistoryScreenViewModel() }
+    val historyItems by viewModel.historyItems.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchUserMatchHistory()
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -36,9 +50,13 @@ fun HistoryScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            item { HistoryItem("Caitlin & Amena", "The Wizard of Oz", "Today\n11:38 am", R.drawable.image17) }
-            item { HistoryItem("Caitlin, Asma, & Jagan", "Interstellar", "Yesterday\n10:56 pm", R.drawable.image18) }
-            item { HistoryItem("Raphael, Asma, Caitlin, Hassan, Amena, Bob, Joe, & Jagan", "Toy Story 4", "01/02/25\n2:36 pm", R.drawable.image19) }
+            items(historyItems) { history ->
+                HistoryItem(
+                    names = history.names,
+                    movie = history.movie,
+                    timestamp = history.timestamp,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -46,16 +64,17 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryItem(names: String, movie: String, timestamp: String, imageRes: Int) {
+fun HistoryItem(names: String, movie: Movie, timestamp: String) {
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = movie,
+        AsyncImage(
+            model = movie.getFullImageUrl(),
+            contentDescription = movie.title,
             modifier = Modifier
                 .size(64.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -70,7 +89,7 @@ fun HistoryItem(names: String, movie: String, timestamp: String, imageRes: Int) 
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
-                text = movie,
+                text = movie.title,
                 color = Color.Black,
                 style = MaterialTheme.typography.titleLarge
             )
@@ -104,5 +123,5 @@ fun TopNavigationNoBackArrow(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 private fun HistoryPreview() {
-    HistoryScreen()
+    HistoryScreen(navController = NavController(LocalContext.current))
 }

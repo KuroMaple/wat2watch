@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,6 +25,8 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import utils.Movie
 import com.team1.wat2watch.ui.SwipeExample.Constants.TOP_CARD_INDEX
 import com.team1.wat2watch.ui.SwipeExample.Constants.TOP_Z_INDEX
@@ -41,7 +44,8 @@ import kotlin.math.roundToInt
 @Composable
 fun SwipeableCard(
     dataSource: List<Movie>,
-    matchViewModel: MatchViewModel
+    matchViewModel: MatchViewModel,
+    navController: NavController
 ) {
 
     val visibleCard: Int = StrictMath.min(3, dataSource.size)
@@ -96,17 +100,8 @@ fun SwipeableCard(
 
 
 
-    fun onSwipeRight(movie: Movie) {
-        println("First Card: ${firstCard.intValue}")
-        val targetMovie = dataSource[firstCard.intValue]
-        addToWatchList(
-            movieId = targetMovie.id.toString(),
-            title = targetMovie.title,
-            release_date = targetMovie.release_date,
-            poster_path = targetMovie.poster_path ?: "",
-            overview = targetMovie.overview,
-            adult = targetMovie.adult
-        )
+    fun onSwipeRight(movie: Movie, navController: NavController) {
+        matchViewModel.handleSwipeRight(targetMovieIndex = firstCard.intValue, navController)
     }
 
     fun onSwipeLeft(movie: Movie) {
@@ -130,7 +125,7 @@ fun SwipeableCard(
                     offset = offset,
                     rearrangeForward = { rearrangeForward() },
                     rearrangeBackward = { rearrangeBackward() },
-                    onSwipeRight = { onSwipeRight(curMovie) },
+                    onSwipeRight = { onSwipeRight(curMovie, navController) },
                     onSwipeLeft = { onSwipeLeft(curMovie) },
                     animationSpec = animationSpec
                 )
@@ -318,8 +313,11 @@ fun SwipeableCardPreview(){
         )
     )
 
+    val fakeNavController = rememberNavController()
+
     SwipeableCard(
         dataSource = movieList,
-        matchViewModel = MatchViewModel()
+        matchViewModel = MatchViewModel(),
+        navController = fakeNavController
     )
 }
