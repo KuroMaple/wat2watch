@@ -9,8 +9,6 @@ import androidx.navigation.NavController
 import com.team1.wat2watch.ui.match.MatchViewModel
 import kotlinx.coroutines.launch
 import wat2watch.utils.FirestoreHelper
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeViewModel: ViewModel() {
     // Input area for session code
@@ -19,6 +17,10 @@ class HomeViewModel: ViewModel() {
 
     private val _username = MutableLiveData<String>()
     val username: LiveData<String> = _username
+
+    private val _errorMessage = MutableLiveData<String?>(null)
+    val errorMessage: LiveData<String?> = _errorMessage
+
     fun setUsername(userName: String){
         _username.value = userName
     }
@@ -29,8 +31,13 @@ class HomeViewModel: ViewModel() {
 
     fun setCode(newCode: String) {
         _code.value = newCode
+        // Clear error when user types
+        _errorMessage.value = null
     }
 
+    fun clearError() {
+        _errorMessage.value = null
+    }
 
     fun onCreatePartyClick(
         navController: NavController,
@@ -69,41 +76,53 @@ class HomeViewModel: ViewModel() {
     ){
         val targetSessionId = _code.value
         if (targetSessionId.isNullOrBlank()) {
-            Log.e("HomeViewModel", "Code input is null or blank")
+            _errorMessage.value = "Please enter a party code"
             return
         }
 
         viewModelScope.launch {
             try {
+                Log.d("HomeViewModel", "Attempting to join party with code: $targetSessionId")
+
                 val sessionId = FirestoreHelper.getSessionIdFromAliasAsync(sessionAlias = targetSessionId)
-                val currentUserUsername = FirestoreHelper.joinSessionWithIdAsync(
-                    sessionId
-                )
+                Log.d("HomeViewModel", "Session ID retrieved: $sessionId")
 
-                val sessionInfo = FirestoreHelper.getSessionInfoAsync(
-                    sessionId
-                )
-
-
-                Log.d("HomeViewModel", "$currentUserUsername joined session " +
-                        "${sessionInfo.sessionId} successfully")
-
-                // Update Joiner's ViewModel fields
-                matchViewModel.setSolo(false)
-                matchViewModel.setSessionID(sessionInfo.sessionId)
-                sessionInfo.users.forEach {
-                    matchViewModel.addParticipant(it)
+                if (sessionId.isBlank()) {
+                    Log.d("HomeViewModel", "Party does not exist - blank session ID")
+                    _errorMessage.value = "Party does not exist"
+                    return@launch
                 }
-                matchViewModel.setSessionAlias(sessionInfo.sessionAlias)
-                navController.navigate("match")
-            }
-            catch (e: Exception) {
-                Log.e("HomeViewModel", "Error joining party: ${e.message}")
+
+                try {
+                    val currentUserUsername = FirestoreHelper.joinSessionWithIdAsync(sessionId)
+                    Log.d("HomeViewModel", "User '$currentUserUsername' joined session")
+
+                    val sessionInfo = FirestoreHelper.getSessionInfoAsync(sessionId)
+                    Log.d("HomeViewModel", "Session info retrieved: ${sessionInfo.sessionAlias} with ${sessionInfo.users.size} users")
+
+                    matchViewModel.setSolo(false)
+                    matchViewModel.setSessionID(sessionInfo.sessionId)
+
+                    // Clear participants first to avoid duplicates
+                    sessionInfo.users.forEach { username ->
+                        Log.d("HomeViewModel", "Adding participant: $username")
+                        matchViewModel.addParticipant(username)
+                    }
+
+                    matchViewModel.setSessionAlias(sessionInfo.sessionAlias)
+
+                    Log.d("HomeViewModel", "Navigating to match screen")
+                    navController.navigate("match")
+                } catch (e: Exception) {
+                    Log.e("HomeViewModel", "Error during session join process: ${e.message}", e)
+                    _errorMessage.value = "Error joining party: ${e.message ?: "Unknown error"}"
+                }
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error joining party: ${e.message}", e)
+                _errorMessage.value = "Party does not exist"
             }
         }
-
     }
-
 
     private fun fetchUsername() {
         viewModelScope.launch {

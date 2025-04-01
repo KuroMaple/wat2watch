@@ -180,21 +180,38 @@ fun HomeScreenPreview() {
 @Composable
 fun CodeInput(viewModel: HomeViewModel){
     val code by viewModel.code.observeAsState("") // Default to empty string
-    BasicTextField(
-        value = code,
-        onValueChange = { viewModel.setCode(it) },
-        textStyle = TextStyle(
-            fontSize = 16.sp,
-            color = Color.Black,
-            fontFamily = com.team1.wat2watch.ui.login.nunitoSansFont,
-        ),
-        modifier = Modifier
-            .background(Color(0xfff5f5f5), RoundedCornerShape(8.dp))
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            .requiredWidth(260.dp)
-            .requiredHeight(36.dp)
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-    )
+    val errorMessage by viewModel.errorMessage.observeAsState(null)
+
+    Column {
+        BasicTextField(
+            value = code,
+            onValueChange = { viewModel.setCode(it) },
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                color = Color.Black,
+                fontFamily = com.team1.wat2watch.ui.login.nunitoSansFont,
+            ),
+            modifier = Modifier
+                .background(Color(0xfff5f5f5), RoundedCornerShape(8.dp))
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                .requiredWidth(260.dp)
+                .requiredHeight(36.dp)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+
+        // Display error message if present
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = Color.Red,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = nunitoSansFont
+                ),
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
 }
 
 @Composable
