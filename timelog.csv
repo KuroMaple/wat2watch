@@ -62,4 +62,5 @@ date,Asma,Hassan,Sungmin,Caitlin,Jagan,Amena,task
 2025-03-30,1,0,0,0,0,0,Report work: match functional requirements to specific functions in the codebase  
 2025-03-31,0,7,3,0,0,0,Code review and final testing. Fixed merge conflicts and finalized feature  
 2025-03-31,1,0,0,0,0,0,Test branch locally to validate and run manual E2E tests according to testing matrix and surface some errors on the home page regarding party join links  
-
+2025-04-01,1,1,1,1,1,1,Team meeting to discuss final presentation and demo
+2025-04-01,1,0,0,0,0,0,Fix sign out button and fetch user watchlist to display preview on profile page
