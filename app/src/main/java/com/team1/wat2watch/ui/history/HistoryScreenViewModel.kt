@@ -36,7 +36,8 @@ class HistoryScreenViewModel : ViewModel() {
                 }
 
                 // If match history is empty, use dummy data
-                _historyItems.value = if (mappedHistory.isEmpty()) getDummyData() else mappedHistory
+//                _historyItems.value = if (mappedHistory.isEmpty()) getDummyData() else mappedHistory
+                _historyItems.value = mappedHistory
             },
             onFailure = { e ->
                 Log.e("HistoryScreenViewModel", "Failed to fetch match history: ${e.message}")
