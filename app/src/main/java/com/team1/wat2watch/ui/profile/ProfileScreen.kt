@@ -3,6 +3,7 @@ package com.team1.wat2watch.ui.profile
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,9 +25,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.team1.wat2watch.R
 import com.team1.wat2watch.ui.login.LoginViewModel
+import utils.Movie
 
 @JvmOverloads
 @Composable
@@ -33,30 +37,24 @@ fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     navController: NavController,
-    loginViewModel: LoginViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    loginViewModel: LoginViewModel
 ) {
     val signOutEvent by viewModel.signOutEvent.observeAsState(false)
     val username = viewModel.username.observeAsState("User").value
     val creationDate = viewModel.creationDate.observeAsState("12/24").value
     val scrollState = rememberScrollState()
 
+    val watchedMovies by viewModel.watchedMovies.collectAsState(emptyList())
+
+    // Handle sign out navigation
     LaunchedEffect(signOutEvent) {
-        if (signOutEvent == true) {
+        if (signOutEvent) {
             Log.d("ProfileScreen", "Sign out event detected, navigating to login")
-
-            // Force logout again to be sure
-            FirebaseAuth.getInstance().signOut()
-
-            // Reset login state
-            loginViewModel.resetLoginState()
-
-            // Navigate to login with a very clear navigation instruction
+            // Navigate to login with clear backstack
             navController.navigate("login") {
-                // Clear all back stack entries
                 popUpTo(0) { inclusive = true }
             }
-
-            // Reset the sign out event after navigation
+            // Reset the sign out event
             viewModel._signOutEvent.postValue(false)
         }
     }
@@ -208,61 +206,47 @@ fun ProfileScreen(
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Placeholder movie posters - replace with actual data
-                repeat(3) {
-                    Card(
+                // Show up to 3 movies from watchlist
+                watchedMovies.take(3).forEach { movie ->
+                    AsyncImage(
+                        model = movie.getFullImageUrl(),
+                        contentDescription = movie.title,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .width(80.dp)
-                            .fillMaxHeight(),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("Movie ${it+1}")
-                        }
-                    }
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(8.dp))
+                    )
                 }
 
+                // "See all" button that navigates to watchlist
                 Card(
                     modifier = Modifier
                         .width(80.dp)
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .clickable { navController.navigate("search") },
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("See all →")
+                        Text(
+                            text = "See all →",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(R.font.nunito_sans_7pt_condensed_light))
+                            )
+                        )
                     }
-                }
-            }
-
-            fun signOut() {
-                // Your existing sign out code (like FirebaseAuth.getInstance().signOut())
-                loginViewModel.resetLoginState() // Reset the login state to ensure loginSuccess is false
-                navController.navigate("login") {
-                    popUpTo("home") { inclusive = true }
                 }
             }
 
             Button(
                 onClick = {
                     Log.d("ProfileScreen", "Sign out button clicked")
-
-                    // Direct approach to sign out and navigate
-                    FirebaseAuth.getInstance().signOut()
                     loginViewModel.resetLoginState()
-
-                    // Navigate immediately
-                    navController.navigate("login") {
-                        popUpTo(0) { inclusive = true }
-                    }
-
-                    // Also trigger the view model's sign out for completeness
-                    viewModel.signOut()
+                    viewModel.signOut() // This will trigger the signOutEvent
                 },
                 modifier = Modifier
                     .fillMaxWidth()

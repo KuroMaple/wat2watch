@@ -7,10 +7,18 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.team1.wat2watch.ui.login.LoginViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import utils.Movie
+import wat2watch.utils.FirestoreHelper
+import wat2watch.utils.FirestoreHelper.getUserMatchHistory
+import wat2watch.utils.FirestoreHelper.getUserWatchlist
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class ProfileScreenViewModel : ViewModel() {
+class ProfileScreenViewModel(
+    private val loginViewModel: LoginViewModel = LoginViewModel()
+) : ViewModel() {
     private val _username = MutableLiveData<String>("")
     val username: LiveData<String> = _username
 
@@ -32,10 +40,23 @@ class ProfileScreenViewModel : ViewModel() {
     private val _signOutSuccess = MutableLiveData<Boolean>()
     val signOutSuccess: LiveData<Boolean> = _signOutSuccess
 
-    private val loginViewModel = LoginViewModel()
+    private val _watchedMovies = MutableStateFlow<List<Movie>>(emptyList())
+    val watchedMovies: StateFlow<List<Movie>> = _watchedMovies
 
     init {
         loadUserData()
+        fetchWatchedMovies()
+    }
+
+    fun fetchWatchedMovies() {
+        FirestoreHelper.getUserWatchlist(
+            onSuccess = { watchlist ->
+                _watchedMovies.value = watchlist
+            },
+            onFailure = { e ->
+                Log.e("ProfileScreenViewModel", "Failed to fetch watchlist: ${e.message}")
+            }
+        )
     }
 
     private fun loadUserData() {

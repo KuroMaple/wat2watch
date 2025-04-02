@@ -154,7 +154,12 @@ fun MyApp(viewModel: LoginViewModel, signInWithGoogle: () -> Unit, startDestinat
                     composable("home") { HomeScreen(navController = navController, matchViewModel = matchViewModel) }
                     composable("history") { HistoryScreen(navController = navController) }
                     composable("signup") { SignUpScreen(navController = navController) }
-                    composable("profile") { ProfileScreen(navController = navController) }
+                    composable("profile") {
+                        ProfileScreen(
+                            navController = navController,
+                            loginViewModel = viewModel
+                        )
+                    }
                     composable("match") { MatchScreen(navController, matchViewModel) }
                     composable("search") { WatchlistScreen(navController = navController) }
                     composable("movieDetails/{movieId}") { backStackEntry ->
