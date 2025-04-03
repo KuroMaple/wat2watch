@@ -9,7 +9,6 @@ decide on a movie to watch together by facilitating live matching sessions.
 
 ### 🎯 Features
 ✅ **Live Movie Matching** – Swipe through movie options and match with friends.\
-✅ **Personalized Recommendations** – AI-driven movie suggestions based on preferences.\
 ✅ **Seamless Authentication** – Secure sign-in using Firebase.\
 ✅ **Cross-Platform Availability** – Optimized for Android devices.
 
